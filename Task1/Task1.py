@@ -1,10 +1,12 @@
-input = "L4, L1, R4, R1, R1, L3, R5, L5, L2, L3, R2, R1, L4, R5, R4, L2, R1, R3, L5, R1, L3, L2, R5, L4, L5, R1, R2, L1, R5, L3, R2, R2, L1, R5, R2, L1, L1, R2, L1, R1, L2, L2, R4, R3, R2, L3, L188, L3, R2, R54, R1, R1, L2, L4, L3, L2, R3, L1, L1, R3, R5, L1, R5, L1, L1, R2, R4, R4, L5, L4, L1, R2, R4, R5, L2, L3, R5, L5, R1, R5, L2, R4, L2, L1, R4, R3, R4, L4, R3, L4, R78, R2, L3, R188, R2, R3, L2, R2, R3, R1, R5, R1, L1, L1, R4, R2, R1, R5, L1, R4, L4, R2, R5, L2, L5, R4, L3, L2, R1, R1, L5, L4, R1, L5, L1, L5, L1, L4, L3, L5, R4, R5, R2, L5, R5, R5, R4, R2, L1, L2, R3, R5, R5, R5, L2, L1, R4, R3, R1, L4, L2, L3, R2, L3, L5, L2, L2, L1, L2, R5, L2, L2, L3, L1, R1, L4, R2, L4, R3, R5, R3, R4, R1, R5, L3, L5, L5, L3, L2, L1, R3, L4, R3, R2, L1, R3, R1, L2, R4, L3, L3, L3, L1, L2"
+import time # for nice presentation
 
 class Walker:
     def __init__(self):
         self.dir = 0
         self.long = 0
         self.lat = 0
+        self.track = [(0,0)]
+        self.bunny_hq = None
         
     def turn(self,char):
         if char == "R":
@@ -27,28 +29,40 @@ class Walker:
     def move(self,instruction):
         self.turn(instruction[0])
 
-        dist = int(float(instruction[1]))
+        dist = int(float(instruction[1:]))
 
-        if self.dir == 0:
-            self.long += dist
-        elif self.dir == 1:
-            self.lat += dist
-        elif self.dir == 2:
-            self.long -= dist
-        elif self.dir == 3:
-            self.lat -= dist
+        for _ in range(dist):
+
+            if self.dir == 0:
+                self.long += 1
+            elif self.dir == 1:
+                self.lat += 1
+            elif self.dir == 2:
+                self.long -= 1
+            elif self.dir == 3:
+                self.lat -= 1
+
+            newpos = (self.long,self.lat)
+
+            if self.bunny_hq is None:
+                if newpos in self.track:
+                    self.bunny_hq = newpos
+                    print("found HQ!!!!")
+
+            self.track.append(newpos)
 
     def getPos(self):
         return (self.long,self.lat)
     
-    def getDistFromOrigin(self):
-        return self.long+self.lat
+    def sayDistanceTo(self,pos):
+        print("The distance to %s from the origin is %i"  % (pos, abs(pos[0])+abs(pos[1])))
+
+with open('data.txt', 'r') as myfile:
+    data=myfile.read().split(", ")
 
 me = Walker()
-for inst in input.split(", "):
+for inst in data:
     me.move(inst)
-    print("Lets now move %s!" % inst)
-    print("That makes me face %s and i stand in %s" % (me.getDir(), me.getPos() ))
-    input("Press Enter to continue...")
-    
-print("I am now %i units away from where i started" % me.getDistFromOrigin())
+
+me.sayDistanceTo((me.long,me.lat))
+me.sayDistanceTo(me.bunny_hq)
