@@ -2,15 +2,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>8b9f47d5-07aa-43a3-9edf-b2393923e3ec</ProjectGuid>
+    <ProjectGuid>37051b26-208c-4fa2-abfa-682de4789902</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Task1.py</StartupFile>
+    <StartupFile>Task2.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>Task1</Name>
-    <RootNamespace>Task1</RootNamespace>
+    <Name>Task2</Name>
+    <RootNamespace>Task2</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,7 +21,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Task1.py" />
+    <Compile Include="Task2.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="data.txt" />
