@@ -17,11 +17,6 @@ isAbba a b c d
  | (a == d) && (b == c) = True
  | otherwise = False
 
-cutSectionOne :: [Char] -> [Char]
-cutSectionOne (x:xs)
- | x == '[' = xs
- | otherwise = cutSectionOne xs
-
 data Level = Good | Bad | Meh deriving(Eq,Show)
 
 evalPair :: (Bool,String) -> Level
@@ -41,15 +36,11 @@ evalLine s (x:_)
  | evalPair x == Good = True
  | evalPair x == Meh = s
 
---evalLine s _ = s
-
 taskA  :: [Char] -> IO () 
 taskA s = do
  let splitLists = map (zip (cycle [True,False] )) $ map (splitOneOf "[]" ) $ lines s
  let goodBad = map (evalLine False) splitLists
-
  putStrLn $ show $ length $ filter id goodBad
- --putStrLn $ show $ take 10 (zip3 goodBad splitLists (lines s))
 
 taskB  :: [Char] -> IO () 
 taskB s = do
@@ -58,7 +49,6 @@ taskB s = do
 main =
  readFile "input.txt" >>= \inString ->
   putStrLn "Answer to A:" >>
-  taskA inString >> -- (151 is too high...) (47 is too low)
+  taskA inString >>
   putStrLn "Answer to B:" >>
   taskB inString
-  
