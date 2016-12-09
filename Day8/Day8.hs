@@ -3,7 +3,6 @@ import Data.List (transpose)
 import Data.List.Split (splitOn)
 
 data Screen = Screen [[Bool]]
-
 instance Show Screen where
  show (Screen b) = foldr (++) "" $ map (\y -> y ++ "\n") $ map (foldr (++) "") $ (map (map (\x -> if x then "#" else ".")) b)
 
