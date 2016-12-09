@@ -3,9 +3,8 @@ import Data.List (transpose)
 import Data.List.Split (splitOn)
 
 data Screen = Screen [[Bool]]
-
 instance Show Screen where
- show (Screen b) = foldr (++) "" $ map (\y -> y ++ "\n") $ map (foldr (++) "") $ (map (map (\x -> if x then "#" else ".")) b)
+ show (Screen b) = unlines $ map (map (\x -> if x then '#' else '.')) b
 
 countPixels :: Screen -> Int
 countPixels (Screen b) = sum ( map countPixelRow b)
@@ -64,4 +63,4 @@ main =
  readFile "input.txt" >>= \inString ->
   putStrLn "Answer to A:" >>
   putStrLn (taskA inString) >> -- 27 is too low. 42 is too low. 91 is too low.
-  putStrLn "Answer to B: is shown above! :)" >>
+  putStrLn "Answer to B: is shown above! :)"
