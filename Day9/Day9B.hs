@@ -17,34 +17,29 @@ parseStep x = do
       let head = take l1 x
       let tail = drop (l1+l2) x
       (head,intOne,intTwo,tail)
- 
-applyStep :: (String, Int, Int, String) -> ([Char],[Char])
-applyStep (head,i1,i2,tail) = (head ++ concat((replicate i2 (take i1 tail))), drop i1 tail)
 
-goTakeStep :: String -> ([Char],[Char])
-goTakeStep = applyStep1 . parseStep
-
-takeManySteps :: ([Char],[Char]) -> ([Char],[Char])
-takeManySteps (s1,"") = (s1,"")
-takeManySteps (s1,s2) = takeManySteps1 (s1 ++ fst (goTakeStep1 s2), snd ( goTakeStep1 s2))
-
-processString :: String -> String
-processString s = fst ( takeManySteps1 ("",s))
+processString :: String -> Int
+processString s = do
+  let (head,inLen,multiple,midAndTail) = parseStep s
+  if inLen == -1 then
+    length head
+  else do
+    let (mid,tail) = splitAt inLen midAndTail
+    let headVal = length head
+    let inVal = processString mid
+    let midVal = inVal * multiple -- force evaluation!
+    let tailVal = processString tail
+    headVal + midVal + tailVal
 
 taskB :: String -> IO ()
 taskB indata = do
-  let l = (lines indata) !! 0 -- only parse the first line
-  let pl = pp (Left l)
-  let n = length pl
+  let n = processString indata
   putStrLn $ "Task B:" ++ (show n)
-
-taskA :: String -> IO ()
-taskA indata = do
-  let l = (lines indata) !! 0 -- only parse the first line
-  let pl = processString l
-  let n = length pl
-  putStrLn $ "Task A:" ++ (show n)
 
 main :: IO ()
 main = do 
-  readFile "input.txt" >>= (\file -> taskA file >> taskB file)
+  readFile "input_t.txt" >>= (\file -> taskB file)
+
+-- 10774309174 is too high.
+
+-- program yields correct result on thomas lyckens input
