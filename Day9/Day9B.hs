@@ -1,4 +1,4 @@
-import System.IO (readFile,putStrLn)
+eimport System.IO (readFile,putStrLn)
 import Text.Regex.Posix
 
 pattern :: String
@@ -33,7 +33,7 @@ processString s = do
 
 taskB :: String -> IO ()
 taskB indata = do
-  let n = processString $ head $ lines indata
+  let n = processString $ head $ lines indata -- pick first line only! dont include trailing newlines!
   putStrLn $ "Task B:" ++ (show n)
 
 main :: IO ()
