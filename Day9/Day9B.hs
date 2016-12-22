@@ -33,12 +33,12 @@ processString s = do
 
 taskB :: String -> IO ()
 taskB indata = do
-  let n = processString indata
+  let n = processString $ head $ lines indata
   putStrLn $ "Task B:" ++ (show n)
 
 main :: IO ()
 main = do 
-  readFile "input_t.txt" >>= (\file -> taskB file)
+  readFile "input.txt" >>= (\file -> taskB file)
 
 -- 10774309174 is too high.
 
