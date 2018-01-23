@@ -1,9 +1,12 @@
-import System.IO
-import Data.List
-import Data.List.Split
-import Data.Map hiding (map, foldr, filter) -- the map function in Prelude is sooo nice! :) the foldr i pick from "List" also...
-import Data.Either
-import Data.Char
+{- stack
+  script
+  --resolver lts-10.3
+-}
+import System.IO ( IOMode(ReadMode), withFile, hGetContents)
+import Data.List (sortBy, isInfixOf)
+import Data.List.Split (splitOn)
+import Data.Char (chr)
+import Data.Map (fromListWith, toList)
 
 -- http://stackoverflow.com/questions/7108559/how-to-find-the-frequency-of-characters-in-a-string-in-haskell/7108719#7108719
 -- added in explicit typing. not needed but i find it helping...
@@ -97,5 +100,6 @@ task4b handle = do
 
 main = do
  putStrLn "Answer to A:"
- --withFile "input.txt" ReadMode task4a
+ withFile "input.txt" ReadMode task4a
+ putStrLn "Answer to B:"
  withFile "input.txt" ReadMode task4b

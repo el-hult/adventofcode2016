@@ -1,3 +1,7 @@
+{- stack
+  script
+  --resolver lts-10.3
+-}
 import System.IO
 import Data.List
 import Data.Hash.MD5

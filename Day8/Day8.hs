@@ -1,3 +1,8 @@
+{- stack
+  script
+  --resolver lts-10.3
+-}
+
 import System.IO
 import Data.List (transpose)
 import Data.List.Split (splitOn)

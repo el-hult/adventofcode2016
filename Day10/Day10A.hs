@@ -1,3 +1,8 @@
+{- stack
+  script
+  --resolver lts-10.3
+  --package regex-posix
+-}
 data Command =  Input {recipient :: Target
                     , chipValue :: Chip} |
                 TransferRule {bot :: Target

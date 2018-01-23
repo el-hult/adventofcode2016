@@ -1,3 +1,7 @@
+{- stack
+  script
+  --resolver lts-10.3
+-}
 import System.IO
 
 -- take a String with integers separated by (one or more) spaces and return a List over Int

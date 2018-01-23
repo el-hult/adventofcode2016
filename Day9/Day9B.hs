@@ -1,4 +1,9 @@
-eimport System.IO (readFile,putStrLn)
+{- stack
+  script
+  --resolver lts-10.3
+  --package regex-posix
+-}
+import System.IO (readFile,putStrLn)
 import Text.Regex.Posix
 
 pattern :: String
