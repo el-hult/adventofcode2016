@@ -11,14 +11,12 @@ splitIntLine x = map (read::String->Int) (words x)
 
 canBeTriangle :: [Int] -> Bool
 canBeTriangle x =
-  if (length x) /= 3
+  if length x /= 3
     then error "ValueError - a triangle has three sides only!"
     else do
       let tot = sum x
       let m = maximum x
-      if m*2 < tot
-        then True
-        else False
+      m*2 < tot
 
 countTruesInBoolList :: [Bool] -> Int
 countTruesInBoolList x = sum (map fromEnum x ) -- It happens that Bool values is an enum, where True = 1, and False = 0
@@ -27,15 +25,14 @@ countTruesInBoolList x = sum (map fromEnum x ) -- It happens that Bool values is
 myGroup :: Int -> [a] -> [[a]]
 myGroup _ [] = []
 myGroup n l
-  | n > 0 = (take n l) : (myGroup n (drop n l))
+  | n > 0 = take n l : myGroup n (drop n l)
   | otherwise = error "Negative n"
 
-main = do
- withFile "input.txt" ReadMode (\handle -> do
+main = withFile "input.txt" ReadMode (\handle -> do
   contents <- hGetContents handle
   let l = lines contents
   let i = transpose $ map splitIntLine l
   let j = concat i
   let groupsOfThrees = myGroup 3 j
   let n = countTruesInBoolList $ map canBeTriangle groupsOfThrees
-  putStrLn . show $ n )
+  print n )

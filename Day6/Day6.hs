@@ -28,7 +28,7 @@ taskB  :: Handle -> IO ()
 taskB handle = do
  contents <- hGetContents handle
  let k = map makeCountMap $ transpose $ lines contents
- let n = map fst $ concatMap ( take 1 . reverse . sortBy sortChars) k
+ let n = map fst $ concatMap ( take 1 . sortBy (flip sortChars)) k
  putStrLn n
 
 main = do

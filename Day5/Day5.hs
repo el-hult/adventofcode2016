@@ -39,7 +39,7 @@ getMaybeKeyAndPos _ = Nothing
 
 evalMoves :: [Char] -> [(Int,Char)] -> [Char]
 evalMoves codeState []  = codeState
-evalMoves codeState ((i,c):[])
+evalMoves codeState [(i,c)]
  | not ( elem '-' codeState  ) = codeState -- we are done!
  | codeState !! i  == '-' = replaceNth i c codeState -- set the new value and finish
  | otherwise = codeState  -- it stopped here.... 

@@ -7,7 +7,7 @@ import Data.List
 import Data.List.Split (splitOneOf)
 import Data.Map (toList, fromListWith)
 
-parseString :: [Char] -> Bool
+parseString :: String -> Bool
 
 parseString (a:b:c:d:tail)
  | isAbba a b c d = True
@@ -25,8 +25,8 @@ data Level = Good | Bad | Meh deriving(Eq,Show)
 
 evalPair :: (Bool,String) -> Level
 evalPair (b,s)
- | b && (parseString s) = Good
- | not(b) && (parseString s) = Bad
+ | b && parseString s = Good
+ | not(b) && parseString s = Bad
  | otherwise = Meh
 
 evalLine :: Bool -> [(Bool,String)] -> Bool
@@ -40,15 +40,14 @@ evalLine s (x:_)
  | evalPair x == Good = True
  | evalPair x == Meh = s
 
-taskA  :: [Char] -> IO () 
+taskA  :: String -> IO () 
 taskA s = do
- let splitLists = map (zip (cycle [True,False] )) $ map (splitOneOf "[]" ) $ lines s
+ let splitLists = map (zip (cycle [True,False] ) . splitOneOf "[]" ) $ lines s
  let goodBad = map (evalLine False) splitLists
- putStrLn $ show $ length $ filter id goodBad
+ print $ length $ filter id goodBad
 
-taskB  :: [Char] -> IO () 
-taskB s = do
- putStrLn "hej"
+taskB  :: String -> IO () 
+taskB s = putStrLn "hej"
 
 main =
  readFile "input.txt" >>= \inString ->

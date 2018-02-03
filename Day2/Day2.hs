@@ -5,7 +5,7 @@
 
 import Data.List (foldl')
 import Data.Map (Map, fromList, (!), (!?), member)
-import Data.Maybe (catMaybes)
+import Data.Maybe (mapMaybe)
 
 data Button = One | Two | Three | Four | Five | Six | Seven | Eight | Nine | Alpha | Bravo | Charlie | Delta;
 
@@ -47,8 +47,7 @@ moveOnPad :: NumPad -> Coordinate -> Instruction -> Coordinate
 moveOnPad pad coord instr =
     let attemptedCoordinate = move instr coord
         moveOk = member attemptedCoordinate pad
-    in case moveOk of True -> attemptedCoordinate
-                      False -> coord
+    in if moveOk then attemptedCoordinate else coord
 
 simulateOnePath :: NumPad -> [Instruction] -> Coordinate -> Coordinate
 simulateOnePath pad is c1 = foldl' (moveOnPad pad) c1 is
@@ -93,7 +92,7 @@ numPadA = fromList [
 taskA = do
     x <- readFile "data.txt"
     let y = lines x
-    let iss = map (catMaybes . map parseInstruction) y -- bad input fails silently!
+    let iss = map (mapMaybe parseInstruction) y -- bad input fails silently!
     let bs = addAllButtons numPadA (1,1) iss
     print bs
 
@@ -120,7 +119,7 @@ numPadB = fromList [
 taskB = do
     x <- readFile "data.txt"
     let y = lines x
-    let iss = map (catMaybes . map parseInstruction) y -- bad input fails silently!
+    let iss = map (mapMaybe parseInstruction) y -- bad input fails silently!
     let bs = addAllButtons numPadB (1,1) iss
     print bs
 

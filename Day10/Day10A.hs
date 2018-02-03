@@ -12,8 +12,7 @@ data Command =  Input {recipient :: Target
 data Target = Bot Int |
               Output Int 
               deriving (Show,Eq,Ord)
-data Chip = Chip Int
-            deriving (Show)
+newType Chip = Chip Int
 
 type BotSlot = (Int,[Int])
 
@@ -28,14 +27,14 @@ parseTransferRuleCommand (bi:_:_:_:"output":i1:_:_:_:"output":i2:xs) = TransferR
 
 parseLinetoCommand :: [String] -> Command
 parseLinetoCommand (first:rest)
-  | first == "bot" = parseTransferRuleCommand $ rest
-  | first == "value" = parseInputCommand $ rest
+  | first == "bot" = parseTransferRuleCommand rest
+  | first == "value" = parseInputCommand rest
 
 isInput :: Command -> Bool
 isInput (Input _ _) = True
 isInput _         = False
 isRule :: Command -> Bool
-isRule (TransferRule _ _ _) = True
+isRule TransferRule{} = True
 isRule _ = False
 
 isBot :: Target -> Bool
@@ -46,12 +45,12 @@ createBotSlot :: Int -> (Int,[Int])
 createBotSlot x = (x, [])
 
 replaceAtIndex :: Int -> a -> [a] -> [a]
-replaceAtIndex n item ls = a ++ (item:b) where (a, (_:b)) = splitAt n ls
+replaceAtIndex n item ls = a ++ (item:b) where (a, _:b) = splitAt n ls
 
 botHasTwo :: BotSlot -> Bool
 botHasTwo (i,[]) = False
-botHasTwo (i,(a:[])) = False
-botHasTwo (i,(a:b:_)) = True
+botHasTwo (i,[a]) = False
+botHasTwo (i,a:b:_) = True
 
 getTargetInt :: Target -> Int
 getTargetInt (Bot i) = i
@@ -59,20 +58,20 @@ getTargetInt (Output i) = i
 
 
 applyOneInput :: [BotSlot] -> Command -> [BotSlot]
-applyOneInput xs (Input (Bot i) (Chip j)) = replaceAtIndex i (i,j:(snd (xs !! i))) xs -- add chip j to bot i
+applyOneInput xs (Input (Bot i) (Chip j)) = replaceAtIndex i (i,j:snd (xs !! i)) xs -- add chip j to bot i
 applyOneInput _ _ = []
 
 applyOneTransfer :: [BotSlot] -> Command -> [BotSlot]
 applyOneTransfer botList (TransferRule (Bot i) targetLow targetHigh)
   | not ( botHasTwo $ botList !! i ) = botList -- bot dont have two chips - dont pass any chips on!
   | otherwise = do 
-    let lowChip = (minimum ( snd $ botList !! i))::Int
+    let lowChip = minimum ( snd $ botList !! i) ::Int
     let highChip = maximum $ snd $ botList !! i
     let resetGiveBot = replaceAtIndex i (i,[]::[Int]) botList
     let lowInt = getTargetInt targetLow
     let highInt = getTargetInt targetHigh
-    let newBotSlotLow = (lowInt,lowChip:(snd (resetGiveBot !! lowInt)))
-    let newBotSlotHigh = (highInt,highChip:(snd (resetGiveBot !! highInt)))
+    let newBotSlotLow = (lowInt,lowChip:snd (resetGiveBot !! lowInt))
+    let newBotSlotHigh = (highInt,highChip:snd (resetGiveBot !! highInt))
     let giveLow = if isBot targetLow 
             then  replaceAtIndex lowInt newBotSlotLow resetGiveBot
             else  resetGiveBot
@@ -87,7 +86,7 @@ applyOneTransfer _ _ = []
 checkRound :: [BotSlot]  -> Either [BotSlot] Int
 checkRound x
   | length ( filter (\x -> ((elem 17 . snd) x) && ((elem 61 . snd) x)) ( filter botHasTwo x ) )> 0 = 
-    Right $ fst $ head (filter (\x -> ((elem 17 . snd) x) && ((elem 61 .  snd) x)) ( filter botHasTwo x ))
+    Right $ fst $ head (filter (\x -> (elem 17 . snd) x && ((elem 61 .  snd) x)) ( filter botHasTwo x ))
   | otherwise = Left x
 
 applyTransfers :: Either [BotSlot] Int  -> [Command] -> Either [BotSlot] Int

@@ -17,7 +17,7 @@ makeCountMap inputString =
 splitLast :: [Char] -> [Char] -> [[Char]]
 splitLast c s = do
  let z = splitOn c s
- let j = (length z) -1
+ let j = length z -1
  if j > 0
   then [ concat(take j z), z !! (j)]
   else [s]
@@ -44,7 +44,7 @@ verifyChecksum (Foo inMap _ inCheck _) = do
   else False
 
 takeFive :: [(Char, Int)] -> [Char]
-takeFive x = take 5 [ fst tu | tu <- (sortBy mySort x)]
+takeFive x = take 5 [ fst tu | tu <- sortBy mySort x]
 
 mySort (c1,i1) (c2,i2)
  | i1 < i2 = GT
@@ -69,16 +69,15 @@ alphaMin = fromEnum 'a'
 alphaMax = fromEnum 'z'
 alphaRange = alphaMax - alphaMin + 1
 shiftAlpha :: Char -> Int -> Char
-shiftAlpha letterIn shift = do
+shiftAlpha letterIn shift =
  if letterIn == '-'
-  then do
-   ' ' -- swap - to space
-  else do
+  then ' ' -- swap - to space
+  else
    let charAsInt = fromEnum letterIn -- what ascii index?
-   let relative = charAsInt - alphaMin  -- how much ahead of "a" is it?
-   let dechiperedCharIntRelative = (relative + shift) `mod` alphaRange
-   let w = alphaMin + dechiperedCharIntRelative
-   chr w
+       relative = charAsInt - alphaMin  -- how much ahead of "a" is it?
+       dechiperedCharIntRelative = (relative + shift) `mod` alphaRange
+       w = alphaMin + dechiperedCharIntRelative
+   in chr w
 
 task4a handle = do
  contents <- hGetContents handle
@@ -86,7 +85,7 @@ task4a handle = do
  let c = map getComponents l
  let c2 = filter verifyChecksum c
  let j = map getInt c2 
- putStrLn . show $ (sum j)
+ print $ sum j
 
 task4b handle = do
  contents <- hGetContents handle
@@ -94,9 +93,9 @@ task4b handle = do
  let c = map getComponents l
  let trueRooms = filter verifyChecksum c
  let decrypted = map dechiper trueRooms
- let interesting = filter (\w -> isInfixOf "north" (getNameFromRoom w)) decrypted
+ let interesting = filter (\w -> "north" `isInfixOf` (getNameFromRoom w)) decrypted
  let sorted = sortBy roomSort interesting
- mapM_ (putStrLn . show) sorted
+ mapM_ print sorted
 
 main = do
  putStrLn "Answer to A:"
