@@ -3,6 +3,8 @@
   --resolver lts-10.3
   --package regex-posix
 -}
+import Data.Bifunctor (first, second)
+
 data Command =  Input {recipient :: Target
                     , chipValue :: Chip} |
                 TransferRule {bot :: Target
@@ -12,18 +14,17 @@ data Command =  Input {recipient :: Target
 data Target = Bot Int |
               Output Int 
               deriving (Show,Eq,Ord)
-newType Chip = Chip Int
-
+newtype Chip = Chip Int deriving Show
 type BotSlot = (Int,[Int])
 
 parseInputCommand :: [String] -> Command
 parseInputCommand s = Input (Bot (read (last s)::Int))  (Chip (read (head s)::Int))
 
 parseTransferRuleCommand :: [String] -> Command
-parseTransferRuleCommand (bi:_:_:_:"bot":i1:_:_:_:"bot":i2:xs)       = TransferRule (Bot (read (bi)::Int)) (Bot    (read i1::Int)) (Bot    (read i2::Int))
-parseTransferRuleCommand (bi:_:_:_:"bot":i1:_:_:_:"output":i2:xs)    = TransferRule (Bot (read (bi)::Int)) (Bot    (read i1::Int)) (Output (read i2::Int))
-parseTransferRuleCommand (bi:_:_:_:"output":i1:_:_:_:"bot":i2:xs)    = TransferRule (Bot (read (bi)::Int)) (Output (read i1::Int)) (Bot    (read i2::Int))
-parseTransferRuleCommand (bi:_:_:_:"output":i1:_:_:_:"output":i2:xs) = TransferRule (Bot (read (bi)::Int)) (Output (read i1::Int)) (Output (read i2::Int))
+parseTransferRuleCommand (bi:_:_:_:"bot":i1:_:_:_:"bot":i2:xs)       = TransferRule (Bot (read bi::Int)) (Bot    (read i1::Int)) (Bot    (read i2::Int))
+parseTransferRuleCommand (bi:_:_:_:"bot":i1:_:_:_:"output":i2:xs)    = TransferRule (Bot (read bi::Int)) (Bot    (read i1::Int)) (Output (read i2::Int))
+parseTransferRuleCommand (bi:_:_:_:"output":i1:_:_:_:"bot":i2:xs)    = TransferRule (Bot (read bi::Int)) (Output (read i1::Int)) (Bot    (read i2::Int))
+parseTransferRuleCommand (bi:_:_:_:"output":i1:_:_:_:"output":i2:xs) = TransferRule (Bot (read bi::Int)) (Output (read i1::Int)) (Output (read i2::Int))
 
 parseLinetoCommand :: [String] -> Command
 parseLinetoCommand (first:rest)
@@ -85,9 +86,9 @@ applyOneTransfer _ _ = []
 -- if we are done, return Right and the bot number, else return the list itself.
 checkRound :: [BotSlot]  -> Either [BotSlot] Int
 checkRound x
-  | length ( filter (\x -> ((elem 17 . snd) x) && ((elem 61 . snd) x)) ( filter botHasTwo x ) )> 0 = 
-    Right $ fst $ head (filter (\x -> (elem 17 . snd) x && ((elem 61 .  snd) x)) ( filter botHasTwo x ))
+  | any myBotGetter x = Right $ fst $ head $ filter myBotGetter x
   | otherwise = Left x
+  where myBotGetter = \bot -> botHasTwo bot && (elem 17 . snd) bot && (elem 61 . snd) bot
 
 applyTransfers :: Either [BotSlot] Int  -> [Command] -> Either [BotSlot] Int
 applyTransfers (Right x) _  = Right x
@@ -104,10 +105,10 @@ applyTransferLoop (Left botList) x = applyTransferLoop (Left botList) x
 -- do all magic here.
 main = do
   x <- readFile "input.txt"
-  let asdf = map parseLinetoCommand $ map words $ lines x
-  let (rules,commandsFeedingBotsInputChips) =foldl (\s c -> if isRule c then (c:(fst s),snd s) else (fst s ,c:(snd s)) ) ([],[]) asdf
-  let botMaxNr = maximum $ filter isBot $ (map recipient commandsFeedingBotsInputChips) ++ (map bot rules) ++ (filter isBot $ map highOutput rules) ++ (filter isBot $ map lowOutput rules)
-  let outputMaxNr = maximum $ (filter (not.isBot) $ map highOutput rules) ++ (filter (not.isBot) $ map lowOutput rules)
+  let asdf = map (parseLinetoCommand . words) $ lines x
+  let (rules,commandsFeedingBotsInputChips) =foldl (\s c -> if isRule c then first (c :) s else second (c :) s ) ([],[]) asdf
+  let botMaxNr = maximum $ filter isBot $ map recipient commandsFeedingBotsInputChips ++ map bot rules ++ filter isBot ( map highOutput rules) ++ filter isBot ( map lowOutput rules)
+  let outputMaxNr = maximum $ filter (not.isBot) (map highOutput rules) ++ filter (not.isBot) ( map lowOutput rules)
 
   -- we can let (Int,[Maybe Int]) represent a bot with id Int and a list of its 0, 1 or 2 chips
   let null_state = map createBotSlot [0..(getTargetInt botMaxNr)]
@@ -124,4 +125,4 @@ main = do
   let s5 = applyTransfers s4 rules
   
   -- five rounds was enough...
-  putStrLn $ show $ s5
+  print s5
