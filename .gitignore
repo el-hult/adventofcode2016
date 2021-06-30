@@ -2,3 +2,9 @@
 **/*.hi
 **/*.o
 **/*.exe
+
+# for profiling
+**/*.hp
+**/*.ps
+**/*.pdf
+**/*.aux

@@ -16,7 +16,7 @@ In many folders, the files are named something else, but the above is what I hop
 
 What happens is that `stack` reads the stack config in the beginning of each source file, provides the packages needed and runs the file in interpreted mode.
 
-If the script is too slow (as of writing this, Day5 is very slow), one might want to compile and optimize the program. Run `stack script <filename> --optimize --resolver lts-<xx>` with `<filename>` being whatever script you want to run, and `<xx>` the lts version number that you find in the script header.
+If the script is too slow (as of writing this, Day5 is very slow), one might want to compile and optimize the program. Run `stack script <filename> --optimize --resolver lts-<xx>` with `<filename>` being whatever script you want to run, and `<xx>` the lts version number that you find in the script header. Day 11 is also very slow.
 
 If you by chance get strange output when running the code, consider `stack --color never <filename>`. See https://stackoverflow.com/questions/48597590/why-does-stack-give-wierd-charcter-encoding-in-error-output-on-windows/48597683#48597683.
 
