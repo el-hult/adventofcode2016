@@ -9,7 +9,7 @@ module Main where
 import Data.Ord (comparing)
 import Data.Foldable (toList)
 import Data.Maybe (catMaybes)
-import Data.List (transpose, unfoldr)
+import Data.List (transpose, unfoldr,sort)
 import Control.Monad (guard, join)
 import Data.Set (Set)
 import qualified Data.Set as S
@@ -88,22 +88,28 @@ backupVal y (Just x) = x
 
 defaultHead y = backupVal y . safeHead
 
+
+pairwise :: [a] -> [(a,a)]
+pairwise (a:b:xs) = (a,b):pairwise xs
+pairwise _ = []
+
 -------------------------------------------------------------------------
 --- Domain specific data types and associated functions
 
-data State = State {elevator::Int,items::[Int]} deriving (Eq)
+data State = State {elevator::Int,items::[Int]}
+
+instance Eq State where
+    s1 == s2 = (elevator s1 == elevator s2) && (sort . pairwise . items $ s1) == (sort . pairwise . items $ s2)
 
 -- The Ord must be a total ordering
 -- It is also used as a heuristic - small values is close to the win-state
 instance Ord State where
-    compare s1 s2 = defaultHead EQ . filter (/=EQ) $ comps
+    s1 <= s2 = (itms1,e1) <= (itms2,e2)
         where
-             comps = [comparing negNSafe s1 s2, comparing nFloorFour s1 s2, comparing elevator s1 s2,comparing items s1 s2]
-             nFloorFour = length . filter (/=4) .items
-             negNSafe State{items=items} = inner items 0
-                            where inner [] n = n
-                                  inner [_] n = n
-                                  inner (a:b:xs) n = if a==b then inner xs (n-1) else inner xs n
+            itms1 = sort . pairwise . items $ s1
+            itms2 = sort . pairwise . items $ s2
+            e1 = elevator s1
+            e2 = elevator s2
 
 
 instance Show State where
@@ -161,7 +167,7 @@ bfe s = inner (SS.singleton [s]) S.empty SS.empty
 -- the heuristic is very naive. this does not seem to win much time.
 newtype StateTrack  = StateTrack [State] deriving Eq
 
-instance Ord StateTrack where 
+instance Ord StateTrack where
     compare (StateTrack ss1) (StateTrack ss2) = if length ss1 /= length ss2 then comparing length ss1 ss2 else comparing head ss1 ss2
 
 bfeH :: State -> Seq [State]
@@ -202,11 +208,21 @@ inputStateA = State 1 [1,1,2,3,2,3,2,3,2,3] --element order is Promethium, Cobal
 inputStateB = State 1 [1,1,2,3,2,3,2,3,2,3,1,1,1,1] --element order is Promethium, Cobalt, Curium, Ruthenium, Plutinoim, Elerium, Dilithium
 
 main = do
-    simpleTests
-    --humanReadableTests -- these, I have to check they look good by eye
+    simpleTests -- the program raises an assert if there is a bug
+    humanReadableTests -- these, I have to check they look good by eye
+    print "==================================================================="
     print "Test case - should be 11"
-    print $ solve testState 
+    print $ solve testState
     print "Part A - should be 33"
-    print $ solve inputStateA -- 33 is correct. Takes ca 6 seconds.
+    print $ solve inputStateA -- 33 is correct. Takes ca 0.5 seconds.
     print "ANS B:"
-    print $ solve inputStateB -- 57 is correct. Takes ca 600 seconds.
+    print $ solve inputStateB -- 57 is correct. Takes ca 4 seconds.
+
+{- 
+In a profiling run of my code, it seemed the Set eats a lot of my memory in the runs.
+So maybe I store too many states? How to reduce that?
+To improve the runtime I was inspired by https://blog.jverkamp.com/2016/12/11/aoc-2016-day-11-radiation-avoider/
+The problem don't really care about which element is which. So I whould change the Eq and Ord instance of State so that two states are identical if the 
+elelemnts acan be permutated to look the same. E.g. sort the elements on generator order and then chip order and then go on.
+The search space decreases in part A by 5!=120 and part B with 7!=5040 since there are 5/7 elements.
+ -}
