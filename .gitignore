@@ -8,3 +8,8 @@
 **/*.ps
 **/*.pdf
 **/*.aux
+
+# stack
+.stack-work/
+*~
+*.cabal

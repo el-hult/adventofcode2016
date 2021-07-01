@@ -1,12 +1,7 @@
-{- stack
-  script
-  --resolver lts-10.3
--}
-{- LanguageExtensions OverloadedStrings -}
-import Data.Text (splitOn, unpack)
-import Data.String (fromString)
+module Day1 where
+import Text.Parsec (oneOf,parse,digit,char,sepEndBy1,many1, string, (<|>))
 import Control.Monad.State (State, state, get, put, runState, modify, execState, withState, evalState)
-import Control.Monad (replicateM_, (<=<))
+import Data.Either (Either(Right))
 
 data Instruction = Ins TurnDirection Int deriving Show;
 data Direction = R | L | U | D deriving Show;
@@ -14,9 +9,6 @@ data TurnDirection = CW | CCW deriving Show;
 type Coordinate = (Int,Int);
 type Trail = [Coordinate];
 type FoundHQ = Bool
-
-parseInstruction ('R':ns) = Ins CW $ read ns
-parseInstruction ('L':ns) = Ins CCW $ read ns
 
 turn CW U = R
 turn CW R = D
@@ -69,25 +61,30 @@ go1 L trail@((x,y):_) = (x-1,y) : trail
 go1 R trail@((x,y):_) = (x+1,y) : trail
 
 manhattanDist :: Coordinate -> Int
-manhattanDist (x,y) = abs x + abs y 
+manhattanDist (x,y) = abs x + abs y
 
-stringToInstructions x =
-    let y =  splitOn (fromString ", ") (fromString x)
-        ins = map (parseInstruction . unpack) y
-    in ins
+insP = do{char 'L'; d<- many1 digit; return $ Ins CCW ( read d)} 
+   <|> do{char 'R'; d<- many1 digit; return $ Ins CW  ( read d)}
+inputParser = insP `sepEndBy1` string ", "
+
+-- If we got any successful parse, take it. If we did not, say we just parsed zero instances of it
+unWrapMonoid (Right x) = x
+unWrapMonoid (Left _) = mempty
+
+stringToInstructions :: String -> [Instruction]
+stringToInstructions x = unWrapMonoid $ parse inputParser "" x
 
 
-taskA' :: String -> IO ()
-taskA' x = do
+taskA' x =
     let ins =  stringToInstructions x
         compositeMove = mapM_ goA ins
         finalPos = compositeMove >> do
             (trail,_) <- get
             return $ head trail
         startState = ([(0,0)],U)
-    print $ manhattanDist $ evalState finalPos startState
+    in manhattanDist $ evalState finalPos startState
 
-taskB' x = do
+taskB' x =
     let ins =  stringToInstructions x
         compositeMove = mapM_ goB ins
         finalPos = compositeMove >> do
@@ -95,36 +92,17 @@ taskB' x = do
             return $ head trail
         finalDist = fmap manhattanDist finalPos
         startState = ([(0,0)], U, False)
-    print $ evalState finalDist startState
-
--- Tests --------------------------------------------------------------
-testSnippets = sequence_ [
-    print $ Ins CW 1,
-    print $ parseInstruction "L132",
-    print $ splitOn (fromString ", ") (fromString "asd, gre, asd, qw11"),
-    print $ go1 U [(0,0)],
-    print $ go1 D [(0,0)],
-    print $ go1 R [(0,0)],
-    print $ go1 L [(0,0)],
-    print $ execState (goA (Ins CW 3)) ([(0,0)],U),
-    print $ execState (mapM_ goA [Ins CW 1, Ins CCW 1]) ([(0,0)],U),
-    taskA' "R2, L3",
-    taskA' "R2, R2, R2",
-    taskA' "R5, L5, R5, R3",
-    taskB' "R8, R4, R4, R8" --should return 4
-    ]
+    in evalState finalDist startState
 
 -- TASK A ------------------------------
 taskA = do
-    x <- readFile "data.txt"
-    taskA' x
+    x <- readFile "inputs/day01.txt"
+    print$ taskA' x
 
 -- TASK B -------------------------------------
 taskB = do
-    x <- readFile "data.txt"
-    taskB' x
+    x <- readFile "inputs/day01.txt"
+    print $ taskB' x
 
 -- RUNNER -------------------------------------
--- main = testSnippets -- only tests
-main = sequence_ [testSnippets, taskA, taskB] -- show test output
--- main = sequence_ [taskA, taskB] -- dont show test output
+main = taskA >> taskB

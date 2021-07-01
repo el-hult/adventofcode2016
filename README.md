@@ -1,22 +1,16 @@
-For making the AoC2016 advent calendar. http://adventofcode.com/2016
-
-Please go there and take a look! :)
-
+For solving the AoC2016 advent calendar. http://adventofcode.com/2016
 
 # Instructions
 
-The code is mainly in haskell. I would recommend using it like below.
+I stole much of my directory structure from (Tomash Aschan)[https://github.com/tomasaschan/advent-of-code-2018].
+The migration to this structure is __in progress_ so only day 1 is in this structure, and the others are standalones that should be run interactively in their respective folders.
 
-1. Download stack from https://haskellstack.org/
-1. To run the program corresponding to a specific day, first `cd Day<nr>` and then `stack Day<nr><A|B>.hs`.
+To just run a single day, install libraries with `stack setup`, compile all code with `stack build` and then run `stack exec aoc2016 -- X` for day `X`.
 
-Be prepared that the first time you run a file, a lot of libraries will be downloaded.
+I ran `stack build --test --fast --file-watch --exec "aoc2016 X` where `X` is the day, to run test suites and my current day.
 
-In many folders, the files are named something else, but the above is what I hope to be the convention. :)
+*This works!:
+`stack build --test --fast --file-watch --exec "aoc2016 1"`
 
-What happens is that `stack` reads the stack config in the beginning of each source file, provides the packages needed and runs the file in interpreted mode.
-
-If the script is too slow (as of writing this, Day5 is very slow), one might want to compile and optimize the program. Run `stack script <filename> --optimize --resolver lts-<xx>` with `<filename>` being whatever script you want to run, and `<xx>` the lts version number that you find in the script header. Day 11 is also very slow.
-
-If you by chance get strange output when running the code, consider `stack --color never <filename>`. See https://stackoverflow.com/questions/48597590/why-does-stack-give-wierd-charcter-encoding-in-error-output-on-windows/48597683#48597683.
-
+## Bugs
+If you by chance get strange output when running the code, consider `stack --color never <filename>`. See https://stackoverflow.com/questions/48597590/why-does-stack-give-wierd-charcter-encoding-in-error-output-on-windows/48597683#48597683. 
