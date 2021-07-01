@@ -1,7 +1,4 @@
-{- stack
-  script
-  --resolver lts-10.3
--}
+module Day2 where
 
 import Data.List (foldl')
 import Data.Map (Map, fromList, (!), (!?), member)
@@ -64,16 +61,6 @@ addAllButtons pad c1 iss =
     let (bs,_) = foldl' ( addNextButton pad ) ([],c1) iss
     in bs
 
-testSnippets = sequence_ [
-    print $ move U (0,0),
-    print $ numPadA !? (1,1),
-    print $ moveOnPad numPadA (0,0) U,
-    print $ moveOnPad numPadA (0,0) D,
-    print $ addNextButton numPadA ([Five],(1,1)) [U,U,U,L,L],
-    print $ addAllButtons numPadA (1,1) [[U,U,U],[L,L]]
-    ]
-
-
 -- TASK A ------------------------------
 
 numPadA :: NumPad
@@ -90,7 +77,7 @@ numPadA = fromList [
     ]
 
 taskA = do
-    x <- readFile "data.txt"
+    x <- readFile "inputs/day02.txt"
     let y = lines x
     let iss = map (mapMaybe parseInstruction) y -- bad input fails silently!
     let bs = addAllButtons numPadA (1,1) iss
@@ -117,12 +104,11 @@ numPadB = fromList [
     ]
 
 taskB = do
-    x <- readFile "data.txt"
+    x <- readFile "inputs/day02.txt"
     let y = lines x
     let iss = map (mapMaybe parseInstruction) y -- bad input fails silently!
     let bs = addAllButtons numPadB (1,1) iss
     print bs
 
 -- RUNNER -------------------------------------
--- main = sequence_ [testSnippets, taskA, taskB] -- show test output
-main = sequence_ [taskA, taskB] -- dont show test output
+main = taskA >> taskB

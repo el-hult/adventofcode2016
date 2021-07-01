@@ -1,9 +1,11 @@
 import qualified Day1 as D1
+import qualified Day2 as D2
 import Test.HUnit
 import Control.Monad.State ( execState ) 
+import Data.Map ((!?))
 
 
-testDay1 :: Test
+
 testDay1 = TestList [
     TestLabel "test1" $ TestCase (assertEqual "Nice show" "Ins CW 1" (show $ D1.Ins D1.CW 1)),
     TestLabel "test2" $ TestCase (assertEqual "Nice show" "[Ins CW 7,Ins CCW 3,Ins CCW 1,Ins CW 7]" (show $ D1.stringToInstructions "R7, L3, L1, R7")),
@@ -19,7 +21,16 @@ testDay1 = TestList [
     TestLabel "test12" $ TestCase (assertEqual "Solve B correct" 4 (D1.taskB' "R8, R4, R4, R8"))
     ]
 
+testDay2 = TestList [
+    TestLabel "testX" $ TestCase (assertEqual "Nice show" "(-1,0)" (show $ D2.move D2.U (0,0))),
+    TestLabel "testX" $ TestCase (assertEqual "Nice show" "Just 5" (show $ D2.numPadA !? (1,1))),
+    TestLabel "testX" $ TestCase (assertEqual "Nice show" "(0,0)" (show $ D2.moveOnPad D2.numPadA (0,0) D2.U)),
+    TestLabel "testX" $ TestCase (assertEqual "Nice show" "(1,0)" (show $ D2.moveOnPad D2.numPadA (0,0) D2.D)),
+    TestLabel "testX" $ TestCase (assertEqual "Nice show" "([5,1],(0,0))" (show $ D2.addNextButton D2.numPadA ([D2.Five],(1,1)) [D2.U,D2.U,D2.U,D2.L,D2.L])),
+    TestLabel "testX" $ TestCase (assertEqual "Nice show" "[2,1]" (show $ D2.addAllButtons D2.numPadA (1,1) [[D2.U,D2.U,D2.U],[D2.L,D2.L]]))
+    ]
+
 main :: IO ()
 main = do
-    counts <- runTestTT testDay1
+    counts <- runTestTT $ TestList [testDay1, testDay2]
     print counts
