@@ -1,47 +1,45 @@
-{- stack
-  script
-  --resolver lts-10.3
--}
+module Day4 where
+
 import System.IO ( IOMode(ReadMode), withFile, hGetContents)
-import Data.List (sortBy, isInfixOf)
-import Data.List.Split (splitOn)
+import Data.List (sortBy, isInfixOf, unfoldr)
 import Data.Char (chr)
 import Data.Map (fromListWith, toList)
+
+-- https://stackoverflow.com/questions/4978578/how-to-split-a-string-in-haskell
+separateBy :: Eq a => a -> [a] -> [[a]]
+separateBy chr = unfoldr sep where
+  sep [] = Nothing
+  sep l  = Just . fmap (drop 1) . break (== chr) $ l
 
 -- http://stackoverflow.com/questions/7108559/how-to-find-the-frequency-of-characters-in-a-string-in-haskell/7108719#7108719
 -- added in explicit typing. not needed but i find it helping...
 makeCountMap ::  [Char] -> [(Char, Int)]
-makeCountMap inputString = 
+makeCountMap inputString =
  toList $ fromListWith (+) [(c, 1) | c <- inputString]
 
-splitLast :: [Char] -> [Char] -> [[Char]]
+splitLast :: Char -> [Char] -> [[Char]]
 splitLast c s = do
- let z = splitOn c s
+ let z = separateBy c s
  let j = length z -1
  if j > 0
-  then [ concat(take j z), z !! (j)]
+  then [ concat(take j z), z !! j]
   else [s]
 
--- http://stackoverflow.com/questions/30242668/remove-characters-from-string-in-haskell
-removePunc xs = [ x | x <- xs, not (x `elem` ",.?!-:;\"\'[]") ]
+removePunc xs = [ x | x <- xs, x `notElem` ",.?!-:;\"\'[]" ]
 
 data MyContainer = Foo [(Char, Int)] Int [Char] [Char] deriving (Show)
 data MyContainer2 = DecodedRoom [Char] Int deriving (Show)
 
 getComponents :: [Char] -> MyContainer
 getComponents line = do
- let h = splitOn "[" line
- let g = splitLast "-" (h !! 0)
- Foo (makeCountMap (removePunc (g!!0))) (read (g!!1) :: Int) (init (h !! 1)) (h !! 0)
+  let h1:h2:_ = separateBy '[' line
+  let g1:g2:_ = splitLast '-' h1
+  Foo (makeCountMap (removePunc g1)) (read g2 :: Int) (init h2) h1
 
 
 
 verifyChecksum :: MyContainer -> Bool
-verifyChecksum (Foo inMap _ inCheck _) = do
- let testee = takeFive inMap
- if testee == inCheck
-  then True
-  else False
+verifyChecksum (Foo inMap _ inCheck _) = inCheck == takeFive inMap
 
 takeFive :: [(Char, Int)] -> [Char]
 takeFive x = take 5 [ fst tu | tu <- sortBy mySort x]
@@ -55,14 +53,14 @@ mySort (c1,i1) (c2,i2)
 getInt (Foo _ i _ _) = i
 getNameFromRoom (DecodedRoom c _) = c
 
-roomSort (DecodedRoom n1 _ ) (DecodedRoom n2 _ ) 
+roomSort (DecodedRoom n1 _ ) (DecodedRoom n2 _ )
  | n1 > n2 = GT
  | n2 > n1 = LT
 
 
 dechiper :: MyContainer -> MyContainer2
 dechiper (Foo _ sectorId _ crypto) = do
- let z = map (\w -> shiftAlpha w sectorId) crypto
+ let z = map (`shiftAlpha` sectorId) crypto
  DecodedRoom z sectorId
 
 alphaMin = fromEnum 'a'
@@ -84,7 +82,7 @@ task4a handle = do
  let l = lines contents
  let c = map getComponents l
  let c2 = filter verifyChecksum c
- let j = map getInt c2 
+ let j = map getInt c2
  print $ sum j
 
 task4b handle = do
@@ -93,12 +91,12 @@ task4b handle = do
  let c = map getComponents l
  let trueRooms = filter verifyChecksum c
  let decrypted = map dechiper trueRooms
- let interesting = filter (\w -> "north" `isInfixOf` (getNameFromRoom w)) decrypted
+ let interesting = filter (\w -> "north" `isInfixOf` getNameFromRoom w) decrypted
  let sorted = sortBy roomSort interesting
  mapM_ print sorted
 
 main = do
  putStrLn "Answer to A:"
- withFile "input.txt" ReadMode task4a
+ withFile "inputs/day04.txt" ReadMode task4a --137896
  putStrLn "Answer to B:"
- withFile "input.txt" ReadMode task4b
+ withFile "inputs/day04.txt" ReadMode task4b -- 501
