@@ -2,6 +2,7 @@ module Day10 where
 
 import Data.Map (insert,Map,insertWith,findWithDefault, fromList)
 import Control.Monad.State
+    ( MonadState(get, put), evalState, State )
 import Data.List (foldr, isPrefixOf, groupBy, sortOn)
 import Util (splitOn,repeatM)
 
@@ -182,8 +183,7 @@ partB x =
     let inputLines = lines x :: [String]
         initialNetworkState = makeInitialState inputLines ::NetworkState
         ruleSet = getRuleset inputLines
-        (output,networkState) = runState (myStateProcessing ruleSet) initialNetworkState
-    in output
+    in evalState (myStateProcessing ruleSet) initialNetworkState
 
 main = do
   x <- readFile "inputs/day10.txt"
