@@ -1,9 +1,5 @@
-{- stack
-  script
-  --resolver lts-10.3
--}
-import Data.List.Split (splitOneOf)
-
+module Day7 where
+import Util (splitOneOf)
 
 -- Data structures
 newtype IPv7 = IPv7 [String]
@@ -11,6 +7,8 @@ instance Show IPv7 where
     show (IPv7 ss) = 
         let tmp = concat $ zipWith (\c s -> s ++ [c]) (cycle "[]") ss
         in init tmp
+instance Eq IPv7 where
+    (IPv7 a) == (IPv7 b) = a == b
 
 supernetSequences (IPv7 ss) = every 2 ss
 hypernetSequences (IPv7 ss) = every 2 (tail ss)
@@ -66,50 +64,21 @@ supportsSSL ip =
 
 
 -- Tests --------------------------------------------------------------
-testSnippets :: IO()
-testSnippets = sequence_ [
-    putStrLn "# Testing",
-    putStrLn "# Other",
-    print $ windows 2 "abcde", -- ["ab", "bc", "cd", "de"]
-    putStrLn "## Parsing",
-    print $ IPv7 ["abba","qwerty","bajs"],
-    print . parseIPv7 $ "abba[qwerty]bajs",
-    putStrLn "## ABBA detection",
-    print . strHasABBA $ "abba", --true
-    print . strHasABBA $ "qwery", --false
-    print . strHasABBA $ "xxxx", --false
-    print . strHasABBA $ "aaaab", --false
-    print . strHasABBA $ "aaaabba", --true
-    putStrLn "## TLS validation",
-    print . supportsTLS . parseIPv7 $ "abba[mnop]qrst", --true
-    print . supportsTLS . parseIPv7 $ "abcd[bddb]xyyx", --false 
-    print . supportsTLS . parseIPv7 $ "aaaa[qwer]tyui", --false 
-    print . supportsTLS . parseIPv7 $ "ioxxoj[asdfgh]zxcvbn", --true
-    print . supportsTLS . parseIPv7 $ "ioxxoj[asdfgh]zxcvbn[qwertr]alll", --true
-    putStrLn "## Correct row count",
-    readFile "input.txt" >>= print . length . lines, -- 2000
-    putStrLn "## ABA detection",
-    print $ correspondingABABAB "aba" "bab",
-    print $ correspondingABABAB "aba" "qyq",
-    putStrLn "## SSL Validation",
-    print . supportsSSL . parseIPv7 $ "aba[bab]xyz", --true
-    print . supportsSSL . parseIPv7 $ "xyx[xyx]xyx", --false 
-    print . supportsSSL . parseIPv7 $ "aaa[kek]eke", --true 
-    print . supportsSSL . parseIPv7 $ "zazbz[bzb]cdb" --true
-    ]
+
 
     -- TASK A ------------------------------
-taskA = do
+taskA x= do
     putStrLn "Answer to Task A:"
-    x <- readFile "input.txt"
     print . length . filter id . map (supportsTLS . parseIPv7) . lines $ x
     
     -- TASK B -------------------------------------
-taskB = do
+taskB x = do
     putStrLn "Answer to Task B:"
-    x <- readFile "input.txt"
     print . length . filter id . map (supportsSSL . parseIPv7) . lines $ x
 
 
 -- RUNNER -------------------------------------
-main = testSnippets >> taskA >> taskB
+main = do
+    x <- readFile "inputs/day07.txt"
+    taskA x 
+    taskB x

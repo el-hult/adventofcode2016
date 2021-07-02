@@ -4,28 +4,7 @@ import System.IO ( IOMode(ReadMode), withFile, hGetContents)
 import Data.List (sortBy, isInfixOf, unfoldr)
 import Data.Char (chr)
 import Data.Map (fromListWith, toList)
-
--- https://stackoverflow.com/questions/4978578/how-to-split-a-string-in-haskell
-separateBy :: Eq a => a -> [a] -> [[a]]
-separateBy chr = unfoldr sep where
-  sep [] = Nothing
-  sep l  = Just . fmap (drop 1) . break (== chr) $ l
-
--- http://stackoverflow.com/questions/7108559/how-to-find-the-frequency-of-characters-in-a-string-in-haskell/7108719#7108719
--- added in explicit typing. not needed but i find it helping...
-makeCountMap ::  [Char] -> [(Char, Int)]
-makeCountMap inputString =
- toList $ fromListWith (+) [(c, 1) | c <- inputString]
-
-splitLast :: Char -> [Char] -> [[Char]]
-splitLast c s = do
- let z = separateBy c s
- let j = length z -1
- if j > 0
-  then [ concat(take j z), z !! j]
-  else [s]
-
-removePunc xs = [ x | x <- xs, x `notElem` ",.?!-:;\"\'[]" ]
+import Util ( separateBy, makeCountMap, splitLast, removePunc )
 
 data MyContainer = Foo [(Char, Int)] Int [Char] [Char] deriving (Show)
 data MyContainer2 = DecodedRoom [Char] Int deriving (Show)
@@ -35,7 +14,6 @@ getComponents line = do
   let h1:h2:_ = separateBy '[' line
   let g1:g2:_ = splitLast '-' h1
   Foo (makeCountMap (removePunc g1)) (read g2 :: Int) (init h2) h1
-
 
 
 verifyChecksum :: MyContainer -> Bool
