@@ -4,8 +4,8 @@ import Data.List (unfoldr)
 import qualified Data.Map as M
 
 -- https://stackoverflow.com/questions/4978578/how-to-split-a-string-in-haskell
-separateBy :: Eq a => a -> [a] -> [[a]]
-separateBy chr = unfoldr sep where
+splitOn :: Eq a => a -> [a] -> [[a]]
+splitOn chr = unfoldr sep where
   sep [] = Nothing
   sep l  = Just . fmap (drop 1) . break (== chr) $ l
 
@@ -22,7 +22,7 @@ makeCountMap inputString =
 
 splitLast :: Char -> [Char] -> [[Char]]
 splitLast c s = do
- let z = separateBy c s
+ let z = splitOn c s
  let j = length z -1
  if j > 0
   then [ concat(take j z), z !! j]

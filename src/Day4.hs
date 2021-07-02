@@ -4,14 +4,14 @@ import System.IO ( IOMode(ReadMode), withFile, hGetContents)
 import Data.List (sortBy, isInfixOf, unfoldr)
 import Data.Char (chr)
 import Data.Map (fromListWith, toList)
-import Util ( separateBy, makeCountMap, splitLast, removePunc )
+import Util ( splitOn, makeCountMap, splitLast, removePunc )
 
 data MyContainer = Foo [(Char, Int)] Int [Char] [Char] deriving (Show)
 data MyContainer2 = DecodedRoom [Char] Int deriving (Show)
 
 getComponents :: [Char] -> MyContainer
 getComponents line = do
-  let h1:h2:_ = separateBy '[' line
+  let h1:h2:_ = splitOn '[' line
   let g1:g2:_ = splitLast '-' h1
   Foo (makeCountMap (removePunc g1)) (read g2 :: Int) (init h2) h1
 

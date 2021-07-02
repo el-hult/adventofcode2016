@@ -7,7 +7,7 @@ import qualified Day4 as D4
 import qualified Day5 as D5
 import qualified Day6 as D6
 import qualified Day7 as D7
--- import qualified Day8 as D8
+import qualified Day8 as D8
 -- import qualified Day9 as D9
 -- import qualified Day10 as D10
 -- import qualified Day11 as D11
@@ -35,7 +35,7 @@ dayRunners = M.fromList [
     ,(5,D5.main)
     ,(6,D6.main)
     ,(7,D7.main)
-    -- ,(8,D8.main)
+    ,(8,D8.main)
     -- ,(9,D9.main)
     -- ,(10,D10.main)
     -- ,(11,D11.main)
