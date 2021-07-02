@@ -21,11 +21,11 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
-- parsec
+- parsec # welll.... parsing.
 - mtl
-- containers
-- bytestring
-- Cabal # has MD5 implementation
+- containers # LOTS of stuff
+- bytestring # Data.ByteString
+- Cabal # Distribution.Utils.MD5
 
 library:
   source-dirs: src

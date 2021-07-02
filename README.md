@@ -9,8 +9,5 @@ To just run a single day, install libraries with `stack setup`, compile all code
 
 I ran `stack build --test --fast --file-watch --exec "aoc2016 X` where `X` is the day, to run test suites and my current day.
 
-*This works!:
-`stack build --test --fast --file-watch --exec "aoc2016 1"`
-
 ## Bugs
 If you by chance get strange output when running the code, consider `stack --color never <filename>`. See https://stackoverflow.com/questions/48597590/why-does-stack-give-wierd-charcter-encoding-in-error-output-on-windows/48597683#48597683. 

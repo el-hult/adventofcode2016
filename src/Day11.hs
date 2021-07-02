@@ -1,10 +1,4 @@
-{- stack
-  script
-  --resolver lts-10.3
--}
-
--- This code I actually ran by O2 complation first. Then running. IT took too much time otherwise.
-module Main where
+module Day11 where
 
 import Data.Ord (comparing)
 import Data.Foldable (toList)

@@ -1,8 +1,10 @@
-{- stack
-  script
-  --resolver lts-10.3
-  --package regex-posix
--}
+module Day10 where
+
+import Data.Map (insert,Map,insertWith,findWithDefault, fromList)
+import Control.Monad.State
+import Data.List (foldr, isPrefixOf, groupBy, sortOn)
+import Util (splitOn,repeatM)
+
 import Data.Bifunctor (first, second)
 
 data Command =  Input {recipient :: Target
@@ -101,28 +103,89 @@ applyTransferLoop (Left botList) [] = Left botList
 applyTransferLoop (Left botList) x = applyTransferLoop (Left botList) x
 
 
-
--- do all magic here.
-main = do
-  x <- readFile "input.txt"
+partA x =
   let asdf = map (parseLinetoCommand . words) $ lines x
-  let (rules,commandsFeedingBotsInputChips) =foldl (\s c -> if isRule c then first (c :) s else second (c :) s ) ([],[]) asdf
-  let botMaxNr = maximum $ filter isBot $ map recipient commandsFeedingBotsInputChips ++ map bot rules ++ filter isBot ( map highOutput rules) ++ filter isBot ( map lowOutput rules)
-  let outputMaxNr = maximum $ filter (not.isBot) (map highOutput rules) ++ filter (not.isBot) ( map lowOutput rules)
-
-  -- we can let (Int,[Maybe Int]) represent a bot with id Int and a list of its 0, 1 or 2 chips
-  let null_state = map createBotSlot [0..(getTargetInt botMaxNr)]
-  -- go through all the commandsFeedingBotsInputChips crap (feed the relevant bots wit their first chip!)
-  let s0 = foldl applyOneInput null_state commandsFeedingBotsInputChips
-  -- check if the test is on initial state
-  
-
-  -- do one more round
-  let s1 = applyTransfers (Left s0) rules
-  let s2 = applyTransfers s1 rules
-  let s3 = applyTransfers s2 rules
-  let s4 = applyTransfers s3 rules
-  let s5 = applyTransfers s4 rules
-  
+      (rules,commandsFeedingBotsInputChips) =foldl (\s c -> if isRule c then first (c :) s else second (c :) s ) ([],[]) asdf
+      botMaxNr = maximum $ filter isBot $ map recipient commandsFeedingBotsInputChips ++ map bot rules ++ filter isBot ( map highOutput rules) ++ filter isBot ( map lowOutput rules)
+      outputMaxNr = maximum $ filter (not.isBot) (map highOutput rules) ++ filter (not.isBot) ( map lowOutput rules)
+      -- we can let (Int,[Maybe Int]) represent a bot with id Int and a list of its 0, 1 or 2 chips
+      null_state = map createBotSlot [0..(getTargetInt botMaxNr)]
+      -- go through all the commandsFeedingBotsInputChips crap (feed the relevant bots wit their first chip!)
+      s0 = foldl applyOneInput null_state commandsFeedingBotsInputChips
+      -- check if the test is on initial state
+      -- do one more round
+      s1 = applyTransfers (Left s0) rules
+      s2 = applyTransfers s1 rules
+      s3 = applyTransfers s2 rules
+      s4 = applyTransfers s3 rules
+      s5 = applyTransfers s4 rules
   -- five rounds was enough...
-  print s5
+  in s5
+
+
+
+-------
+-- B --
+-------
+
+type Node = String
+type NetworkState = Map Node [Int]
+type Rule = (Node,Node,Node) -- (from, toLow, toHi)
+
+swapPair:: (a,b) -> (b,a)
+swapPair (a,b) = (b,a)
+
+getInputs :: [String] -> [(Int,Int)]
+getInputs x = 
+    map (getTagetAndChip . splitOn ' ') $
+    filter (isPrefixOf "value")  x
+    where getTagetAndChip (_:val:_:_:_:botNum:_) = (read val, read botNum) -- :: [String] -> (Int,Int)
+
+makeInitialState inputLines = 
+    let inputs = getInputs inputLines
+        tmp  = groupBy (\a b-> fst a == fst b) . sortOn fst $ map swapPair inputs
+        tmp2 = [ ("bot " ++ show ( fst (head x)), map snd x) | x <- tmp] :: [(Node,[Int])]
+    in fromList tmp2 :: NetworkState
+
+getRuleset :: [String] -> [Rule ]
+getRuleset x = 
+    map (getRule . splitOn ' ') $
+    filter (isPrefixOf "bot")  x
+    where getRule (_:fromNum:_:_:_:loType:loNum:_:_:_:hiType:hiNum:_) = ("bot "++fromNum, loType++" "++loNum, hiType++" "++hiNum ) :: Rule
+
+applyOneRule :: Rule -> NetworkState -> NetworkState
+applyOneRule (from,toLow,toHi) state =  if nChips < 2 then state else updatedState
+    where nChips = length(findWithDefault [] from state)
+          chips = findWithDefault [] from state -- we get a bug if the bot holds more than 2 chips!
+          chipMin = minimum chips
+          chipMax = maximum chips
+          update1 = insertWith (++) toLow [chipMin]  state -- send to lo
+          update2 = insertWith (++) toHi [chipMax]  update1 -- send to Hi
+          update3 = insert from [] update2 -- empty the old list
+          updatedState = update3
+
+applyAllRules :: [Rule] -> State NetworkState ()
+applyAllRules ruleset = do
+  state <- get
+  let state' = foldr applyOneRule state ruleset
+  put state'
+
+myStateProcessing :: [Rule] -> State NetworkState Int
+myStateProcessing ruleset = do
+    repeatM 100 (applyAllRules ruleset) -- 100 was more than enough to converge, it seems
+    -- I should probably do the stateful control flow of https://hackage.haskell.org/package/monad-loops-0.4.3/docs/Control-Monad-Loops.html and make a loop until all chips are in outputs
+    state <- get
+    return $ head (findWithDefault [] "output 0" state ) * head (findWithDefault [] "output 1" state ) *head (findWithDefault [] "output 2" state )
+
+
+partB x = 
+    let inputLines = lines x :: [String]
+        initialNetworkState = makeInitialState inputLines ::NetworkState
+        ruleSet = getRuleset inputLines
+        (output,networkState) = runState (myStateProcessing ruleSet) initialNetworkState
+    in output
+
+main = do
+  x <- readFile "inputs/day10.txt"
+  print $ partA x -- see that 27 is in the output state, which is correct
+  print $ partB x --13272

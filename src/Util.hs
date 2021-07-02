@@ -30,4 +30,6 @@ splitLast c s = do
 
 removePunc xs = [ x | x <- xs, x `notElem` ",.?!-:;\"\'[]" ]
 
-
+repeatM n f  
+  | n <= 1 = f
+  | otherwise  = f >> repeatM (n-1) f -- do monadic action n times
