@@ -1,6 +1,7 @@
 import qualified Day1 as D1
 import qualified Day2 as D2
 import qualified Day7 as D7
+import qualified Day9 as D9
 import Test.HUnit
 import Control.Monad.State ( execState ) 
 import Data.Map ((!?))
@@ -57,7 +58,13 @@ testDay7 = TestList [
                                            TestCase $ assertBool "case4" $ D7.supportsSSL . D7.parseIPv7 $ "zazbz[bzb]cdb"]
     ]
 
+testDay9 = TestLabel "Day 9" $ TestList [
+    TestCase $ assertEqual "Simple Parse" ("abc",3,7,"ghi") $ D9.parseStep "abc(3x7)ghi" ,
+    TestCase $ assertEqual "Double Parse Gets one" ("abc",3,7,"ghi(9x1)oo") $ D9.parseStep "abc(3x7)ghi(9x1)oo" ,
+    TestCase $ assertEqual "Failing Parse" ("abcghi",-1,0,"") $ D9.parseStep "abcghi"
+    ]
+
 main :: IO ()
 main = do
-    counts <- runTestTT $ TestList [testDay1, testDay2, testDay7]
+    counts <- runTestTT $ TestList [testDay1, testDay2, testDay7, testDay9]
     print counts
