@@ -24,6 +24,8 @@ dependencies:
 - parsec
 - mtl
 - containers
+- bytestring
+- Cabal # has MD5 implementation
 
 library:
   source-dirs: src
