@@ -37,11 +37,11 @@ testDay7 = TestList [
     TestLabel "Parsing" $ TestList [ TestCase $ assertEqual "Show" "abba[qwerty]bajs" $ show $ D7.IPv7 ["abba","qwerty","bajs"],
                                      TestCase $ assertEqual "Parsing" (D7.IPv7 ["abba","qwerty","bajs"]) (D7.parseIPv7  "abba[qwerty]bajs")
                            ],
-    TestLabel "ABBA detection" $ TestList [ TestCase $ True @=? (D7.strHasABBA "abba"),
-                                            TestCase $ False @=? (D7.strHasABBA "qwery"),
-                                            TestCase $ False @=? (D7.strHasABBA "xxxx"),
-                                            TestCase $ False @=? (D7.strHasABBA "aaaab"),
-                                            TestCase $ True @=? (D7.strHasABBA "aaaabba")
+    TestLabel "ABBA detection" $ TestList [ TestCase $ True @=? D7.strHasABBA "abba",
+                                            TestCase $ False @=? D7.strHasABBA "qwery",
+                                            TestCase $ False @=? D7.strHasABBA "xxxx",
+                                            TestCase $ False @=? D7.strHasABBA "aaaab",
+                                            TestCase $ True @=? D7.strHasABBA "aaaabba"
                                             ],
     TestLabel "TLS validation" $ TestList [TestCase $ assertBool "case1" $ D7.supportsTLS . D7.parseIPv7 $ "abba[mnop]qrst",
                                            TestCase $ assertBool "case2" $ not . D7.supportsTLS . D7.parseIPv7 $ "abcd[bddb]xyyx",
