@@ -1,9 +1,7 @@
-{- stack
-  script
-  --resolver lts-10.3
--}
-import System.IO
-import Data.List
+module Day6 where 
+
+import Data.List ( sortBy, transpose ) 
+import System.IO (Handle, withFile, IOMode(ReadMode), hGetContents)
 import Data.Map (toList, fromListWith)
 
 makeCountMap ::  [Char] -> [(Char, Int)]
@@ -33,6 +31,6 @@ taskB handle = do
 
 main = do
  putStrLn "Answer to A:"
- withFile "input.txt" ReadMode taskA
+ withFile "inputs/day06.txt" ReadMode taskA -- xhnqpqql
  putStrLn "Answer to B:"
- withFile "input.txt" ReadMode taskB
+ withFile "inputs/day06.txt" ReadMode taskB -- brhailro
