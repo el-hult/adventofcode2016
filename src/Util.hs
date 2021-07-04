@@ -33,3 +33,12 @@ removePunc xs = [ x | x <- xs, x `notElem` ",.?!-:;\"\'[]" ]
 repeatM n f  
   | n <= 1 = f
   | otherwise  = f >> repeatM (n-1) f -- do monadic action n times
+
+untilM_ :: (Monad m) => 
+  m a  -- the action to perform
+  -> m Bool -- the predicate to check
+  -> m ()
+action `untilM_` predicate = do
+  action
+  b <- predicate
+  if b then pure () else action `untilM_` predicate

@@ -3,11 +3,17 @@
 **/*.o
 **/*.exe
 
-# for profiling
+# for profiling and coverage
 **/*.hp
 **/*.ps
 **/*.pdf
 **/*.aux
+.hpc
+hpc_*
+*.tix
+*.prof
+*.svg
+*.html
 
 # stack
 .stack-work/
