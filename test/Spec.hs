@@ -9,6 +9,7 @@ import Control.Monad.State ( execState, evalState, runState )
 import Data.Map ((!?))
 import qualified Data.Map as M
 import Data.Either (Either(Right))
+import qualified Data.Sequence as SS
 
 
 
@@ -86,8 +87,11 @@ testDay13 = TestLabel "Day 13" $ TestList [
     TestCase $ False @=?  D13.isOpen 10 (1,0),
     TestCase $ False @=?  D13.isOpen 10 (-1,0),
     TestCase $ True @=?  D13.isOpen 10 (2,2),
-    TestCase $ [(1,1),(2,2)] @=?  D13.neighborStates 10 (1,2),
-    TestCase $ Just 11 @=? (+) (-1) . length <$> D13.shortestPathTo 10 (1,1) (7,4)
+    TestCase $ [(2,2),(1,1)] @=?  D13.neighborStates 10 (1,2),
+    TestCase $ 11 @=? ((+) (-1) . SS.length) (D13.shortestPathTo 10 (1,1) (7,4)),
+    TestCase $ 1 @=? D13.solveB 10 0 (1,1),
+    TestCase $ 3 @=? D13.solveB 10 1 (1,1),
+    TestCase $ 5 @=? D13.solveB 10 2 (1,1)
     ]
 
 main :: IO ()

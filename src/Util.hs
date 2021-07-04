@@ -1,5 +1,6 @@
 module Util where
 
+import Control.Monad ( MonadPlus(mplus) )
 import Data.List (unfoldr)
 import qualified Data.Map as M
 
@@ -30,6 +31,11 @@ splitLast c s = do
 
 removePunc xs = [ x | x <- xs, x `notElem` ",.?!-:;\"\'[]" ]
 
+
+
+------------------------------------------------------------------------------------
+-- Inspired or stolen from https://hackage.haskell.org/package/monad-loops-0.4.3/docs/Control-Monad-Loops.html
+
 repeatM n f  
   | n <= 1 = f
   | otherwise  = f >> repeatM (n-1) f -- do monadic action n times
@@ -42,3 +48,21 @@ action `untilM_` predicate = do
   action
   b <- predicate
   if b then pure () else action `untilM_` predicate
+
+
+whileM' :: (Monad m) => m Bool -> m a -> m [a]
+whileM' p f = go
+    where go = do
+            x <- p
+            if x
+                then do
+                        x  <- f
+                        xs <- go
+                        return (x : xs)
+                else return []
+
+untilM' :: (Monad m) => m a -> m Bool -> m [a]
+f `untilM'` p = do
+        x  <- f
+        xs <- whileM' (fmap not p) f
+        return (x : xs)
