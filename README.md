@@ -57,11 +57,16 @@ is not suitable for this package, since the library is compiled into the executa
 Instead, we must use GHC coverage options directly.
 
 ```powershell
-stack test --ghc-options -fhpc # both runs the tests and builds the main binary
+stack build --ghc-options -fhpc # both builds the main binary so that it emits coverage data when run
 aoc2016 <dayNr1> # run whatever days you like
 aoc2016 <dayNr2> # run whatever days you like
-stack exec hpc -- markup aoc2016.EXE.tix # compile the report from tests and the days you ran
+stack exec hpc -- markup aoc2016.EXE.tix # compile the report from the days you ran
 open hpc_index.html # look at the report
 ```
 
-You can run the executable many times and all coverage is accumulated
+To get coverage for the tests, I have only managed a strange workaround. The Test runner is a temporary script Main.hs. So we can get the report for the test script. But not its libraries. Very strange.
+
+```powershell
+stack test --ghc-options -fhpc
+open Main.hs.html
+```
