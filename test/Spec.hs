@@ -3,6 +3,7 @@ import qualified Day2 as D2
 import qualified Day7 as D7
 import qualified Day9 as D9
 import qualified Day12 as D12
+import qualified Day13 as D13
 import Test.HUnit
 import Control.Monad.State ( execState, evalState, runState )
 import Data.Map ((!?))
@@ -80,7 +81,16 @@ testDay12 = TestLabel "Day 12" $ TestList [
         ]
     ]
 
+testDay13 = TestLabel "Day 13" $ TestList [
+    TestCase $ True @=?  D13.isOpen 10 (7,4),
+    TestCase $ False @=?  D13.isOpen 10 (1,0),
+    TestCase $ False @=?  D13.isOpen 10 (-1,0),
+    TestCase $ True @=?  D13.isOpen 10 (2,2),
+    TestCase $ [(1,1),(2,2)] @=?  D13.neighborStates 10 (1,2),
+    TestCase $ Just 11 @=? (+) (-1) . length <$> D13.shortestPathTo 10 (1,1) (7,4)
+    ]
+
 main :: IO ()
 main = do
-    counts <- runTestTT $ TestList [testDay1, testDay2, testDay7, testDay9, testDay12]
+    counts <- runTestTT $ TestList [testDay1, testDay2, testDay7, testDay9, testDay12, testDay13]
     print counts
