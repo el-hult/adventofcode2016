@@ -1,5 +1,6 @@
 module Lib where
 import Text.Read (readMaybe)
+import Data.Maybe (fromMaybe)
 import qualified Day1 as D1
 import qualified Day2 as D2
 import qualified Day3 as D3
@@ -25,7 +26,6 @@ import qualified Day12 as D12
 -- import qualified Day23 as D23
 -- import qualified Day24 as D24
 import qualified Data.Map as M
-
 
 dayRunners = M.fromList [
     (1,D1.main)
@@ -54,8 +54,4 @@ dayRunners = M.fromList [
     -- ,(24,D24.main)
     ]
 
-runDay s = case readMaybe s of
-    Just n-> case M.lookup n dayRunners of
-        Just runner -> runner
-        _ -> putStrLn "invalid day"
-    _ -> putStrLn "invalid day"
+runDay s =  fromMaybe (putStrLn "invalid day") (readMaybe s >>= flip M.lookup dayRunners)
