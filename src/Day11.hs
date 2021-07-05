@@ -11,6 +11,8 @@ import Control.Exception ( assert )
 import Data.Sequence (Seq (..),(><),(|>))
 import qualified Data.Sequence as SS
 
+import Util (safeHead)
+
 
 -------------------------------------------------------------------------
 -- https://stackoverflow.com/a/40581425/4050510
@@ -74,8 +76,6 @@ distictUnorderedPairs list = do
 pickOneOrTwo :: Ord a => [a] -> [[a]]
 pickOneOrTwo list = singles list ++ distictUnorderedPairs list
 
-safeHead [] = Nothing
-safeHead (x:_) = Just x
 
 backupVal y Nothing = y
 backupVal y (Just x) = x

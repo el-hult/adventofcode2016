@@ -1,8 +1,11 @@
 module Util where
 
 import Control.Monad ( MonadPlus(mplus) )
-import Data.List (unfoldr)
+import Data.List (unfoldr, tails)
 import qualified Data.Map as M
+import Distribution.Utils.MD5 (md5, showMD5)
+import qualified Data.ByteString as B
+import Data.Char (ord)
 
 -- https://stackoverflow.com/questions/4978578/how-to-split-a-string-in-haskell
 splitOn :: Eq a => a -> [a] -> [[a]]
@@ -31,6 +34,16 @@ splitLast c s = do
 
 removePunc xs = [ x | x <- xs, x `notElem` ",.?!-:;\"\'[]" ]
 
+safeHead [] = Nothing
+safeHead (x:_) = Just x
+
+
+hashString :: String -> String
+hashString = showMD5 . md5 . B.pack . map (fromIntegral . ord)
+
+{-| Generate sliding windows from a list -}
+windows :: Int -> [a] -> [[a]]
+windows m = foldr (zipWith (:)) (repeat []) . take m . tails
 
 
 ------------------------------------------------------------------------------------

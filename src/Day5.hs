@@ -1,12 +1,9 @@
 module Day5 where
 
 import Data.Maybe ( catMaybes )
-import Data.Char ( digitToInt, ord )
-import Distribution.Utils.MD5 (md5, showMD5)
-import qualified Data.ByteString as B
+import Data.Char ( digitToInt )
 
-hashString :: String -> String
-hashString = showMD5 . md5 . B.pack . map (fromIntegral . ord)
+import Util (hashString)
 
 getMaybeKey :: String -> Maybe Char
 getMaybeKey ('0':'0':'0':'0':'0':x:_) = Just x
