@@ -4,6 +4,7 @@ import qualified Day7 as D7
 import qualified Day9 as D9
 import qualified Day12 as D12
 import qualified Day13 as D13
+import qualified Day16 as D16
 import Test.HUnit
 import Control.Monad.State ( execState, evalState, runState )
 import Data.Map ((!?))
@@ -94,7 +95,15 @@ testDay13 = TestLabel "Day 13" $ TestList [
     TestCase $ 5 @=? D13.solveB 10 2 (1,1)
     ]
 
+testDay16 = TestList $ map TestCase $[
+    (@=?) "10000011110010000111" $ D16.toStr . take 20 . D16.dragonUntil  20 . D16.toBV $"10000",
+    (@=?) "100" $ D16.toStr . D16.getChecksum . D16.toBV $"110010110100",
+    (@=?) "01100" $ D16.toStr . D16.getChecksum . D16.toBV $"10000011110010000111",
+    (@=?) "01100" $ D16.solve 20 "10000"
+    ]
+
+
 main :: IO ()
 main = do
-    counts <- runTestTT $ TestList [testDay1, testDay2, testDay7, testDay9, testDay12, testDay13]
+    counts <- runTestTT $ TestList [testDay1, testDay2, testDay7, testDay9, testDay12, testDay13, testDay16]
     print counts

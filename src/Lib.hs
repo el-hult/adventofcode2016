@@ -16,7 +16,7 @@ import qualified Day12 as D12
 import qualified Day13 as D13
 import qualified Day14 as D14
 import qualified Day15 as D15
--- import qualified Day16 as D16
+import qualified Day16 as D16
 -- import qualified Day17 as D17
 -- import qualified Day18 as D18
 -- import qualified Day19 as D19
@@ -43,7 +43,7 @@ dayRunners = M.fromList [
     ,(13,D13.main)
     ,(14,D14.main)
     ,(15,D15.main)
-    -- ,(16,D16.main)
+    ,(16,D16.main)
     -- ,(17,D17.main)
     -- ,(18,D18.main)
     -- ,(19,D19.main)
