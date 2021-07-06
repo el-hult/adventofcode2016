@@ -58,6 +58,7 @@ go1 U trail@((x,y):_) = (x,y+1) : trail
 go1 D trail@((x,y):_) = (x,y-1) : trail
 go1 L trail@((x,y):_) = (x-1,y) : trail
 go1 R trail@((x,y):_) = (x+1,y) : trail
+go1 _ _ = error "Illegal ipnut?"
 
 manhattanDist :: Coordinate -> Int
 manhattanDist (x,y) = abs x + abs y
