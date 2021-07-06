@@ -31,12 +31,11 @@ goA (Ins turnDir num) = do
 goB :: Instruction -> State (Trail, Direction, FoundHQ) ()
 goB (Ins turnDir num) = do
     (trail,dir, foundHQ) <- get
-    if foundHQ 
+    if foundHQ
     then return ()
     else do
         let dir' = turn turnDir dir
         put (trail, dir', foundHQ)
-        
         let loop True _ = return ()
             loop False n = do
                 foundNow <- move1AndCheck
@@ -63,8 +62,8 @@ go1 R trail@((x,y):_) = (x+1,y) : trail
 manhattanDist :: Coordinate -> Int
 manhattanDist (x,y) = abs x + abs y
 
-insP = do{char 'L'; d<- many1 digit; return $ Ins CCW ( read d)} 
-   <|> do{char 'R'; d<- many1 digit; return $ Ins CW  ( read d)}
+insP = (char 'L' *> (Ins CCW . read <$> many1 digit))
+   <|> (char 'R' *> (Ins CW . read <$> many1 digit))
 inputParser = insP `sepEndBy1` string ", "
 
 -- If we got any successful parse, take it. If we did not, say we just parsed zero instances of it
