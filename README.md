@@ -70,3 +70,15 @@ To get coverage for the tests, I have only managed a strange workaround. The Tes
 stack test --ghc-options -fhpc
 open Main.hs.html
 ```
+
+### Documentation
+Some Modules (e.g. Day 14) script have documentation in them. Compile them with Haddock.
+Read on that page for all options. https://haskell-haddock.readthedocs.io/en/latest/index.html
+
+```powershell
+stack install haddock
+stack exec haddock -- --html  src/Day14.hs
+open Day14.html
+```
+
+I guess one can set it up smarter, with some dedicated output folder and so on... but wth.

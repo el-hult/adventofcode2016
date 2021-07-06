@@ -19,3 +19,10 @@ hpc_*
 .stack-work/
 *~
 *.cabal
+
+# haddock
+*.js
+*.css
+*.json
+*.png
+*.html

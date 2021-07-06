@@ -1,5 +1,36 @@
 {-# LANGUAGE Arrows #-}
 
+{-|
+Module      :  Day14
+Maintainer  :  ludvig.hult@gmail.com
+
+= Day 14
+This is my solution to Day 14 in the 2016 installment of Advent of Code. 
+The full description can be found [here](https://adventofcode.com/2016/day/14)
+
+= Solution structure
+I realized that we were to do a data pipeline (a set of incoming increments transformed by a set of rules and then filtered)
+so I thought it would be time to learn about Arrows.
+
+It seems Arrows is an invention from 1998 and has since fallen slightly out of style. Often, a monad or a applicative is
+at least as expressive, and they are more flexible.
+
+Still, the arrow style i suitable whn doing things that seems like a pipeline, and several libraries use it, so I have used them here.
+
+The specific Arrow is one called `Circuit`, and I have stolen it from https://en.wikibooks.org/wiki/Haskell/Arrow_tutorial#Hangman:_Main_program
+It is essentially stateful mappings over lists.
+
+There are some more recent readings on arrows. I have ordered them in the way I think one should read them.
+
+- https://www.youtube.com/watch?v=W_NARxJEU5I
+- https://stackoverflow.com/questions/44632182/haskell-arrow-tutorial-loop-state
+- https://blog.paulme.ng/posts/2012-04-22-haskell-arrow.html
+- https://hackage.haskell.org/package/base-4.15.0.0/docs/Control-Arrow.html
+
+Lastly, there is a GHC extension that introduces so-called Arrow syntax. It is a variant of do-notation for arrows. I have enabled it
+since the `Circuit` example uses it in `mean2`
+
+-}
 module Day14 where
 
 import Util (hashString,safeHead)
@@ -12,7 +43,10 @@ import qualified Data.Sequence as SQ
 import Data.Sequence (Seq(..))
 import Data.Maybe (isJust)
 
-{-| Curcuits are from https://en.wikibooks.org/wiki/Haskell/Arrow_tutorial#Hangman:_Main_program
+-- * The Cicruit Code
+
+{-|
+ Curcuits are from https://en.wikibooks.org/wiki/Haskell/Arrow_tutorial#Hangman:_Main_program
  They are neat, since they hold accumulators, so they are stateful. :)
  It seems, that the trend in general is away from arrows, towards applicatives, but I kind of like arrows :)
  -}
@@ -30,6 +64,14 @@ instance Arrow Circuit where
     first (Circuit cir) = Circuit $ \(b, d) ->
         let (cir', c) = cir b
         in  (first cir', (c, d))
+
+{-| Run a circuit over a list, emitting a new list.
+Fulfils the rule 
+
+> map f xs = runCircuit (id f) xs
+
+but circuits can also be stateful, and are thus more expressive than normal maps
+-}
 runCircuit :: Circuit a b -> [a] -> [b]
 runCircuit _   []     = []
 runCircuit cir (x:xs) =
@@ -45,6 +87,9 @@ accum acc f = Circuit $ \input ->
 -- | Accumulator that outputs the accumulator value.
 accum' :: b -> (a -> b -> b) -> Circuit a b
 accum' acc f = accum acc (\a b -> let b' = a `f` b in (b', b'))
+
+
+-- ** Circuit application examples
 total = accum' 0 (+)
 mean1 = (total &&& (const 1 ^>> total)) >>> arr (uncurry (/))
 
@@ -53,9 +98,7 @@ mean2 = proc value -> do
     n <- total -< 1
     returnA -< t / n
 
------------------------------------------------------------------------------------------------
--- END OF THE CIRCUIT EXAMPLE CODE
------------------------------------------------------------------------------------------------
+-- * My own Solution code
 
 slide :: Int -> Circuit a (Maybe (SQ.Seq a))
 slide n =
@@ -80,6 +123,11 @@ collapseSeq (h :<| t) = case fst h of
 inputSalt = "ngcjuoqr" -- the input of the day
 testSalt = "abc"
 
+{-|
+The Meat of my solution. a *Pipeline*. 
+It transforms integers into nested tuples that say what index they are from, what characters are relevant
+for identification of triplets etc and if they are a valid OTP.
+-}
 pipe salt hash = arr (\x -> x-999) &&& (arr (\x -> salt++show x)
         >>> arr hash
         >>> arr firstTriplet &&& arr allQuintuplets
