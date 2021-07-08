@@ -9,6 +9,16 @@ To just run a single day, install libraries with `stack setup`, compile all code
 
 I ran `stack build --test --fast --file-watch --exec "aoc2016 <dayNr>` where `<dayNr>` is the day, to run test suites and my current day.
 
+## Alternative running
+Another way to run the code is with `ghcid`. I find it REALLY nice for these small things. 
+To run Day17 upon saves, and revealing the package HUnit, executing the test-function and also all eval-expresions run the stuff below. See also https://github.com/ndmitchell/ghcid 
+
+```powershell
+stack install ghcid
+cd src
+stack exec ghcid -- --command='stack ghci Day17.hs --package HUnit' --allow-eval --test test
+```
+
 ## Bugs
 If you by chance get strange output when running the code, consider `stack --color never <filename>`. See https://stackoverflow.com/questions/48597590/why-does-stack-give-wierd-charcter-encoding-in-error-output-on-windows/48597683#48597683. 
 

@@ -5,6 +5,7 @@ import qualified Day9 as D9
 import qualified Day12 as D12
 import qualified Day13 as D13
 import qualified Day16 as D16
+import qualified Day17 as D17
 import Test.HUnit
 import Control.Monad.State ( execState, evalState, runState )
 import Data.Map ((!?))
@@ -103,7 +104,29 @@ testDay16 = TestList $ map TestCase $[
     ]
 
 
+initialStateTest0 = D17.makeState2 "hijkl"
+initialStateTest1 = D17.makeState2 "ihgpwlah"
+initialStateTest2 = D17.makeState2 "kglvqrro"
+initialStateTest3 = D17.makeState2 "ulqzkmiv"
+
+testDay17 = TestList $ map TestCase [
+         [D17.D] @=? D17.doors initialStateTest0,
+         [D17.makeState (1,2) "hijklD" 5 1] @=? D17.getNeighbors initialStateTest0,
+         [D17.U,D17.R] @=? D17.doors (D17.makeState (1,2) "hijklD" 4 1),
+         D17.makeState (1,2) "hijklD" 5 1 @=? D17.step D17.D initialStateTest0,
+         [] @=? D17.doors (D17.makeState (2,2) "hijklDR" 4 1),
+        "DDRRRD" @=?  D17.solveA initialStateTest1,
+        "DDUDRLRRUDRD" @=?  D17.solveA initialStateTest2,
+        "DRURDRUDDLLDLUURRDULRLDUUDDDRR" @=?  D17.solveA initialStateTest3
+        ,370 @=?  D17.solveB initialStateTest1 -- VERY SLOW test. Takes several minutes.
+        ,492 @=?  D17.solveB initialStateTest2 -- VERY SLOW test. Takes several minutes.
+        ,830 @=?  D17.solveB initialStateTest3 -- VERY SLOW test. Takes several minutes.
+        ]
+
+
 main :: IO ()
 main = do
-    counts <- runTestTT $ TestList [testDay1, testDay2, testDay7, testDay9, testDay12, testDay13, testDay16]
+    counts <- runTestTT $ TestList [
+        testDay1, testDay2, testDay7, testDay9, testDay12, testDay13, testDay16,
+        testDay17]
     print counts
