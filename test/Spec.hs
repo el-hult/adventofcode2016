@@ -6,6 +6,7 @@ import qualified Day12 as D12
 import qualified Day13 as D13
 import qualified Day16 as D16
 import qualified Day17 as D17
+import qualified Day18 as D18
 import Test.HUnit
 import Control.Monad.State ( execState, evalState, runState )
 import Data.Map ((!?))
@@ -118,15 +119,27 @@ testDay17 = TestList $ map TestCase [
         "DDRRRD" @=?  D17.solveA initialStateTest1,
         "DDUDRLRRUDRD" @=?  D17.solveA initialStateTest2,
         "DRURDRUDDLLDLUURRDULRLDUUDDDRR" @=?  D17.solveA initialStateTest3
-        ,370 @=?  D17.solveB initialStateTest1 -- VERY SLOW test. Takes several minutes.
-        ,492 @=?  D17.solveB initialStateTest2 -- VERY SLOW test. Takes several minutes.
-        ,830 @=?  D17.solveB initialStateTest3 -- VERY SLOW test. Takes several minutes.
+        --,370 @=?  D17.solveB initialStateTest1 -- VERY SLOW test. Takes several minutes.
+        --,492 @=?  D17.solveB initialStateTest2 -- VERY SLOW test. Takes several minutes.
+        --,830 @=?  D17.solveB initialStateTest3 -- VERY SLOW test. Takes several minutes.
         ]
 
+testDay18 = TestList $ map TestCase [
+    (@=?) "..^^.\n.^^^^\n^^..^\n" $ unlines . map show . take 3 . iterate D18.nextR $ D18.initRowTest1,
+    (@=?) ".^^.^.^^^^\n^^^...^..^\n^.^^.^.^^.\n..^^...^^^\n.^^^^.^^.^\n^^..^.^^..\n^^^^..^^^.\n^..^^^^.^^\n.^^^..^.^^\n^^.^^^..^^\n" $ unlines . map show . take 10 . iterate D18.nextR $ D18.initRowTest2,
+    (@=?) 38 $ D18.solveA 10 D18.initRowTest2
+    ]
 
 main :: IO ()
 main = do
     counts <- runTestTT $ TestList [
-        testDay1, testDay2, testDay7, testDay9, testDay12, testDay13, testDay16,
-        testDay17]
+        testDay1,
+        testDay2,
+        testDay7,
+        testDay9,
+        testDay12,
+        testDay13,
+        testDay16,
+        testDay17,
+        testDay18]
     print counts

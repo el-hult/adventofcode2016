@@ -7,7 +7,7 @@ The migration to this structure is __in progress_ so only day 1 is in this struc
 
 To just run a single day, install libraries with `stack setup`, compile all code with `stack build` and then run `stack exec aoc2016 -- <dayNr>` for day `<dayNr>`.
 
-I ran `stack build --test --fast --file-watch --exec "aoc2016 <dayNr>` where `<dayNr>` is the day, to run test suites and my current day.
+I ran `stack build --test --fast --file-watch --exec "aoc2016 <dayNr>"` where `<dayNr>` is the day, to run test suites and my current day.
 
 ## Alternative running
 Another way to run the code is with `ghcid`. I find it REALLY nice for these small things. 
