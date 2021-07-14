@@ -7,12 +7,15 @@ import qualified Day13 as D13
 import qualified Day16 as D16
 import qualified Day17 as D17
 import qualified Day18 as D18
-import Test.HUnit
-import Control.Monad.State ( execState, evalState, runState )
-import Data.Map ((!?))
+import qualified Day19 as D19
+
+import           Control.Monad.State (execState)
+import           Data.Map ((!?))
 import qualified Data.Map as M
-import Data.Either (Either(Right))
+import           Data.Either (Either(Right))
 import qualified Data.Sequence as SS
+import           Data.List (unfoldr)
+import           Test.HUnit
 
 
 
@@ -119,9 +122,9 @@ testDay17 = TestList $ map TestCase [
         "DDRRRD" @=?  D17.solveA initialStateTest1,
         "DDUDRLRRUDRD" @=?  D17.solveA initialStateTest2,
         "DRURDRUDDLLDLUURRDULRLDUUDDDRR" @=?  D17.solveA initialStateTest3
-        --,370 @=?  D17.solveB initialStateTest1 -- VERY SLOW test. Takes several minutes.
-        --,492 @=?  D17.solveB initialStateTest2 -- VERY SLOW test. Takes several minutes.
-        --,830 @=?  D17.solveB initialStateTest3 -- VERY SLOW test. Takes several minutes.
+        --,370 @=?  D17.solveB initialStateTest1 -- VERY SLOW test. Takes several minutes. So skip them for the most part.
+        --,492 @=?  D17.solveB initialStateTest2 -- VERY SLOW test. Takes several minutes. So skip them for the most part.
+        --,830 @=?  D17.solveB initialStateTest3 -- VERY SLOW test. Takes several minutes. So skip them for the most part.
         ]
 
 testDay18 = TestList $ map TestCase [
@@ -129,6 +132,16 @@ testDay18 = TestList $ map TestCase [
     (@=?) ".^^.^.^^^^\n^^^...^..^\n^.^^.^.^^.\n..^^...^^^\n.^^^^.^^.^\n^^..^.^^..\n^^^^..^^^.\n^..^^^^.^^\n.^^^..^.^^\n^^.^^^..^^\n" $ unlines . map show . take 10 . iterate D18.nextR $ D18.initRowTest2,
     (@=?) 38 $ D18.solveA 10 D18.initRowTest2
     ]
+
+testDay19 = TestList $ map TestCase [
+    (@=?) 1 $ D19.solveB 2,
+    (@=?) 3 $ D19.solveB 3,
+    (@=?) 1 $ D19.solveB 4,
+    (@=?) 2 $ D19.solveB 5,
+    (@=?) 3 $ D19.solveB 6,
+    (@=?) [(SS.fromList [1,2,3,5,6],1),(SS.fromList [1,2,3,6],2),(SS.fromList [2,3,6],2),(SS.fromList [3,6],0),(SS.fromList [3],1)] (unfoldr D19.stealOne (SS.fromList [1..6], 0))
+    ]
+
 
 main :: IO ()
 main = do
@@ -141,5 +154,7 @@ main = do
         testDay13,
         testDay16,
         testDay17,
-        testDay18]
+        testDay18,
+        testDay19
+        ]
     print counts
