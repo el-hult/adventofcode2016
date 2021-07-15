@@ -1,11 +1,12 @@
 module Util where
 
-import Control.Monad ( MonadPlus(mplus) )
-import Data.List (unfoldr, tails)
-import qualified Data.Map as M
-import Distribution.Utils.MD5 (md5, showMD5)
+import           Control.Monad ( MonadPlus(mplus) )
+import           Control.Monad.State (State, runState, modify)
 import qualified Data.ByteString as B
-import Data.Char (ord)
+import           Data.Char (ord)
+import qualified Data.Map as M
+import           Data.List (unfoldr, tails)
+import           Distribution.Utils.MD5 (md5, showMD5)
 
 -- https://stackoverflow.com/questions/4978578/how-to-split-a-string-in-haskell
 splitOn :: Eq a => a -> [a] -> [[a]]
@@ -45,6 +46,19 @@ hashString = showMD5 . md5 . B.pack . map (fromIntegral . ord)
 windows :: Int -> [a] -> [[a]]
 windows m = foldr (zipWith (:)) (repeat []) . take m . tails
 
+
+{- | Split a list on first occurrence of some element. Drops the delimiter.
+If there is no delimiter, all is returned in the first component. 
+I think this State monad solution was cute. Instead of passing an accumulator, I 
+just use a State as an acculumator.
+Since the sequences are very short, I use linked lists, despite the append-rights.
+-}
+splitFirst :: Eq a => a -> [a] -> ([a],[a])
+splitFirst y xs = runState (go y xs) []
+                    where go y [] = pure []  :: State [a] [a]
+                          go y (x:xs)
+                            | y == x = pure xs
+                            | otherwise = modify (\s -> s++[x]) >> go y xs
 
 ------------------------------------------------------------------------------------
 -- Inspired or stolen from https://hackage.haskell.org/package/monad-loops-0.4.3/docs/Control-Monad-Loops.html
