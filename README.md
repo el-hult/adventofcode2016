@@ -9,6 +9,9 @@ To just run a single day, install libraries with `stack setup`, compile all code
 
 I ran `stack build --test --fast --file-watch --exec "aoc2016 <dayNr>"` where `<dayNr>` is the day, to run test suites and my current day.
 
+You might notice that most days lie in the `old` folder. That is because boring long bild times is yuck, and I wanted shorter ones. So I did the @taschan way and made a single package for each day. Or rather, from day 21 and forward.
+So in that case, there is a new executable, and `stack build --test --fast --file-watch --exec "day21"`
+
 ## Alternative running
 Another way to run the code is with `ghcid`. I find it REALLY nice for these small things. 
 To run Day17 upon saves, and revealing the package HUnit, executing the test-function and also all eval-expresions run the stuff below. See also https://github.com/ndmitchell/ghcid 

@@ -7,9 +7,6 @@ author:              "Author name here"
 maintainer:          "example@example.com"
 copyright:           "2021 Author name here"
 
-extra-source-files:
-- README.md
-
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
 # category:            Web
@@ -22,10 +19,11 @@ description:         Please see the README on GitHub at <https://github.com/gith
 dependencies:
 - base >= 4.7 && < 5
 - parsec # welll.... parsing.
+- util
 - mtl
 - containers # LOTS of stuff
-- bytestring # Data.ByteString
-- Cabal # Distribution.Utils.MD5
+#- bytestring # Data.ByteString
+#- Cabal # Distribution.Utils.MD5
 
 library:
   source-dirs: src
