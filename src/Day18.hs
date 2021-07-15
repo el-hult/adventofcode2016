@@ -1,59 +1,59 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Day18 where
 
-import Util (windows)
-import Data.List (unfoldr, foldl1')
 import Control.Monad (join)
-{- |
-Module: Day18
+import Data.List (foldl1', unfoldr)
+import Util (windows)
 
-A quite direct implementation.
-Since Haskell is lazy, keeping 400k lines in memory is a not an issue.
-The computation is somewhat quick as well. part B takes a few seconds in compiled mode, and maybe 10-15 seconds in GHCi.
+-- |
+-- Module: Day18
+--
+-- A quite direct implementation.
+-- Since Haskell is lazy, keeping 400k lines in memory is a not an issue.
+-- The computation is somewhat quick as well. part B takes a few seconds in compiled mode, and maybe 10-15 seconds in GHCi.
+--
+-- Parts to improve could be:
+-- - I guess some memoization would be beneficial. See https://hackage.haskell.org/package/MemoTrie
+-- - Implementing the Row as a comonad can be more theory-nice than the window function. See http://blog.sigfpe.com/2006/12/evaluating-cellular-automata-is.html
+-- - Splitting the nextR method into chunks acting on e.g. groups of 6 and memoizing these subpatterns would be nice. See https://en.wikipedia.org/wiki/Hashlife
+data Tile = Safe | Trap deriving (Eq)
 
-Parts to improve could be:
-- I guess some memoization would be beneficial. See https://hackage.haskell.org/package/MemoTrie
-- Implementing the Row as a comonad can be more theory-nice than the window function. See http://blog.sigfpe.com/2006/12/evaluating-cellular-automata-is.html
-- Splitting the nextR method into chunks acting on e.g. groups of 6 and memoizing these subpatterns would be nice. See https://en.wikipedia.org/wiki/Hashlife
--}
-
-
-data Tile = Safe | Trap deriving Eq
-newtype Row = Row {unRow::[Tile]}
+newtype Row = Row {unRow :: [Tile]}
 
 instance Show Tile where
-    show Safe = "."
-    show Trap = "^"
+  show Safe = "."
+  show Trap = "^"
 
 instance Read Tile where
-    readsPrec _ ('^':s) = [(Trap,s)]
-    readsPrec _ ('.':s) = [(Safe,s)]
-    readsPrec _ _ = []
-    readList xs = maybe [] (\l -> [(reverse l,"")]) $ go xs []
-                    where
-                        go "" acc = Just acc
-                        go ('^':s) acc = go s (Trap : acc)
-                        go ('.':s) acc = go s (Safe : acc)
-                        go _ acc = Nothing
+  readsPrec _ ('^' : s) = [(Trap, s)]
+  readsPrec _ ('.' : s) = [(Safe, s)]
+  readsPrec _ _ = []
+  readList xs = maybe [] (\l -> [(reverse l, "")]) $ go xs []
+    where
+      go "" acc = Just acc
+      go ('^' : s) acc = go s (Trap : acc)
+      go ('.' : s) acc = go s (Safe : acc)
+      go _ acc = Nothing
 
 instance Show Row where
-    show (Row []) = ""
-    show (Row (x:xs)) = show x ++ show (Row xs)
+  show (Row []) = ""
+  show (Row (x : xs)) = show x ++ show (Row xs)
 
-rule [Safe,_,Trap] = Trap
-rule [Trap,_,Safe] = Trap
+rule [Safe, _, Trap] = Trap
+rule [Trap, _, Safe] = Trap
 rule _ = Safe
 
-nextR (Row bs) = Row  .  map rule . windows 3 $ padded
-        where padded = Safe:bs++[Safe]
+nextR (Row bs) = Row . map rule . windows 3 $ padded
+  where
+    padded = Safe : bs ++ [Safe]
 
 initRow = Row . read $ "^.^^^..^^...^.^..^^^^^.....^...^^^..^^^^.^^.^^^^^^^^.^^.^^^^...^^...^^^^.^.^..^^..^..^.^^.^.^......."
+
 initRowTest1 = Row . read $ "..^^."
+
 initRowTest2 = Row . read $ ".^^.^.^^^^"
 
-solveA n = length . filter (==Safe) . join . map unRow . take n . iterate nextR 
-
+solveA n = length . filter (== Safe) . join . map unRow . take n . iterate nextR
 
 main = do
-    print $ solveA 40 initRow -- 1913
-    print $ solveA 400000 initRow -- 19 993 564
+  print $ solveA 40 initRow -- 1913
+  print $ solveA 400000 initRow -- 19 993 564

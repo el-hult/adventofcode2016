@@ -1,10 +1,10 @@
 module Day3 where
 
-import Data.List ( transpose )
+import Data.List (transpose)
 
 -- take a String with integers separated by (one or more) spaces and return a List over Int
 splitIntLine x =
-  map (read::String->Int) (words x)
+  map (read :: String -> Int) (words x)
 
 canBeTriangle :: [Int] -> Bool
 canBeTriangle x =
@@ -13,9 +13,9 @@ canBeTriangle x =
     else do
       let tot = sum x
       let m = maximum x
-      m*2 < tot
+      m * 2 < tot
 
-countTruesInBoolList x = sum (map fromEnum x ) -- It happens that Bool values is an enum, where True = 1, and False = 0
+countTruesInBoolList x = sum (map fromEnum x) -- It happens that Bool values is an enum, where True = 1, and False = 0
 
 -- http://stackoverflow.com/questions/12876384/grouping-a-list-into-lists-of-n-elements-in-haskell
 chunk :: Int -> [a] -> [[a]]
@@ -24,7 +24,8 @@ chunk n l
   | n > 0 = take n l : chunk n (drop n l)
   | otherwise = error "Negative n"
 
-partA = countTruesInBoolList . map (canBeTriangle . splitIntLine ) . lines
+partA = countTruesInBoolList . map (canBeTriangle . splitIntLine) . lines
+
 partB = countTruesInBoolList . map canBeTriangle . chunk 3 . concat . transpose . map splitIntLine . lines
 
 main = do
