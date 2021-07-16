@@ -9,8 +9,8 @@ To just run a single day, install libraries with `stack setup`, compile all code
 
 I ran `stack build --test --fast --file-watch --exec "aoc2016 <dayNr>"` where `<dayNr>` is the day, to run test suites and my current day.
 
-You might notice that most days lie in the `old` folder. That is because boring long bild times is yuck, and I wanted shorter ones. So I did the @taschan way and made a single package for each day. Or rather, from day 21 and forward.
-So in that case, there is a new executable, and `stack build --test --fast --file-watch --exec "day21"`
+You might notice that most days lie in the `old` folder. That is because boring long bild times is yuck, and I wanted shorter ones. So I did the @taschan way and made a single package for each day. Or rather, from day 20 and forward.
+So in that case, there is a new executable, and `stack build --test --fast --file-watch --exec "day21"` is the way to go.
 
 ## Alternative running
 Another way to run the code is with `ghcid`. I find it REALLY nice for these small things. 
@@ -38,7 +38,7 @@ This is well developed, but good tutorials are hard to come by. I've seen this r
 
 
 ### Time profiling
-```
+```powershell
 stack build --executable-profiling
 stack exec --profile -- aoc2016 <dayNr> +RTS -p -hc
 cat aoc2016.EXE.prof
@@ -46,7 +46,7 @@ cat aoc2016.EXE.prof
 
 ### Space profiling
 Assumes that you dont have a ps-viewer, but you have installed the ps2pdf program instead. :)
-```
+```powershell
 stack build --executable-profiling
 stack exec --profile -- aoc2016 <dayNr> +RTS -hc
 stack exec hp2ps -- aoc2016.EXE
@@ -55,7 +55,7 @@ open aoc2016.EXE.pdf
 ```
 
 If you don't have ps2pdf, you can get SVG  output with `stack install hp2pretty` and then
-```
+```powershell
 stack build --executable-profiling;
 stack exec --profile -- aoc2016 <dayNr> +RTS -hc; 
 stack exec hp2pretty -- aoc2016.EXE.hp; open aoc2016.EXE.svg
