@@ -1,6 +1,5 @@
 module Day21 where
 
-import Debug.Trace
 import Text.Parsec
 import Text.Parsec.Char
 import Util
