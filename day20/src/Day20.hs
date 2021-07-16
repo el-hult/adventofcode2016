@@ -12,7 +12,7 @@ type Address = Word32
 type Range = (Address, Address)
 
 -- | A blacklist is a SORTED NONOVERLAPPING collection of adress ranges
-newtype Blacklist = Blacklist [Range]
+newtype Blacklist = Blacklist [Range] deriving (Eq, Show)
 
 inRange :: Address -> Range -> Bool
 n `inRange` (n1, n2) = (n1 <= n && n <= n2) || (n1 >= n && n >= n2)
@@ -55,22 +55,5 @@ mergeRangeList (r : rs) = go [] r rs
 makeBlacklist :: String -> Blacklist
 makeBlacklist = Blacklist . mergeRangeList . sort . map (sortTuple . bimap read read . splitFirst '-') . lines
 
--- | Get the first non-blocked address
-solveA :: Blacklist -> Address
-solveA (Blacklist rs) = if n1 == 0 then n2 + 1 else n1 -1
-  where
-    (n1, n2) = head rs
-
--- | Compute the number of non-blocked IP adresses by counting the blocked adresses
--- And then take all allowed adresses minus the blocked ones. A critical step here is that the
--- input to solveB is a BlackList (especially nonoverlapping ranges!).
---
--- Note that Word32 cannot hold 4294967296, so I need to do the computation in two steps. 😂
-solveB :: Blacklist -> Address
-solveB (Blacklist rs) = (+ 1) . (4294967295 -) . sum . map (\(a, b) -> b - a + 1) $ rs
-
-main :: IO ()
-main = do
-  bList <- makeBlacklist <$> readFile "inputs/day20.txt"
-  print $ solveA bList -- 17348573 is right
-  print $ solveB bList -- 104 is right
+totalBlocked :: Blacklist -> Word32
+totalBlocked (Blacklist rs) = sum . map (\(a, b) -> b - a + 1) $ rs

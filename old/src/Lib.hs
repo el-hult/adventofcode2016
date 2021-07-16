@@ -1,9 +1,5 @@
 module Lib where
 
--- import qualified Day21 as D21
--- import qualified Day22 as D22
--- import qualified Day23 as D23
--- import qualified Day24 as D24
 import qualified Data.Map as M
 import Data.Maybe (fromMaybe)
 import qualified Day1 as D1
@@ -18,7 +14,6 @@ import qualified Day17 as D17
 import qualified Day18 as D18
 import qualified Day19 as D19
 import qualified Day2 as D2
-import qualified Day20 as D20
 import qualified Day3 as D3
 import qualified Day4 as D4
 import qualified Day5 as D5
@@ -30,30 +25,25 @@ import Text.Read (readMaybe)
 
 dayRunners =
   M.fromList
-    [ (1, D1.main),
-      (2, D2.main),
-      (3, D3.main),
-      (4, D4.main),
-      (5, D5.main),
-      (6, D6.main),
-      (7, D7.main),
-      (8, D8.main),
-      (9, D9.main),
-      (10, D10.main),
-      (11, D11.main),
-      (12, D12.main),
-      (13, D13.main),
-      (14, D14.main),
-      (15, D15.main),
-      (16, D16.main),
-      (17, D17.main),
-      (18, D18.main),
-      (19, D19.main),
-      (20, D20.main)
-      -- ,(21,D21.main)
-      -- ,(22,D22.main)
-      -- ,(23,D23.main)
-      -- ,(24,D24.main)
+    [ (1, D1.main)
+      ,(2, D2.main)
+      ,(3, D3.main)
+      ,(4, D4.main)
+      ,(5, D5.main)
+      ,(6, D6.main)
+      ,(7, D7.main)
+      ,(8, D8.main)
+      ,(9, D9.main)
+      ,(10, D10.main)
+      ,(11, D11.main)
+      ,(12, D12.main)
+      ,(13, D13.main)
+      ,(14, D14.main)
+      ,(15, D15.main)
+      ,(16, D16.main)
+      ,(17, D17.main)
+      ,(18, D18.main)
+      ,(19, D19.main)
     ]
 
 runDay s = fromMaybe (putStrLn "invalid day") (readMaybe s >>= flip M.lookup dayRunners)

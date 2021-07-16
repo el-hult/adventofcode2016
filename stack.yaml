@@ -9,5 +9,6 @@ resolver:
 # Each package is defined by package.yaml, which hpack translates into a .cabal-file
 packages:
 - old
+- day20
 - day21
 - util
