@@ -60,6 +60,41 @@ splitFirst y xs = runState (go y xs) []
       | y == x = pure xs
       | otherwise = modify (\s -> s ++ [x]) >> go y xs
 
+-- | Find first occurence of an element in a list. You must guarantee that the element is there!
+unsafeIndexOf :: (Eq a, Integral b) => a -> [a] -> b
+unsafeIndexOf a xs = go a xs 0
+  where
+    go a [] i = error "Element not present"
+    go a (x : xs) i
+      | x == a = i
+      | otherwise = go a xs (i + 1)
+
+-- | Rotate the list to the left. Has BAD complexity!
+rotL :: Int -> [a] -> [a]
+rotL x s =
+  let y = (x `mod` length s)
+      a = take y s
+      b = drop y s
+   in b ++ a
+
+-- | Rotate the list to the right. Has BAD complexity!
+rotR :: Int -> [a] -> [a]
+rotR x s =
+  let y = length s - (x `mod` length s)
+   in rotL y s
+
+-- | removes an element at a index in a list.
+unsafePop i xs =
+  let a = take i xs
+      b = drop i xs
+      x = head b
+   in (a ++ tail b, x)
+
+insertAt i xs x =
+  let a = take i xs
+      b = drop i xs
+   in a ++ [x] ++ b
+
 ------------------------------------------------------------------------------------
 -- Inspired or stolen from https://hackage.haskell.org/package/monad-loops-0.4.3/docs/Control-Monad-Loops.html
 
