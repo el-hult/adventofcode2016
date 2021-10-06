@@ -1,6 +1,6 @@
 module Day3 where
 
-import Data.List (transpose)
+import           Data.List (transpose)
 
 -- take a String with integers separated by (one or more) spaces and return a List over Int
 splitIntLine x =

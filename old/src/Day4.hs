@@ -1,10 +1,10 @@
 module Day4 where
 
-import Data.Char (chr)
-import Data.List (isInfixOf, sortBy, unfoldr)
-import Data.Map (fromListWith, toList)
-import System.IO (IOMode (ReadMode), hGetContents, withFile)
-import Util (makeCountMap, removePunc, splitLast, splitOn)
+import           Data.Char (chr)
+import           Data.List (isInfixOf, sortBy, unfoldr)
+import           Data.Map  (fromListWith, toList)
+import           System.IO (IOMode (ReadMode), hGetContents, withFile)
+import           Util      (makeCountMap, removePunc, splitLast, splitOn)
 
 data MyContainer = Foo [(Char, Int)] Int [Char] [Char] deriving (Show)
 

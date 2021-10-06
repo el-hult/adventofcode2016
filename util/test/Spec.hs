@@ -1,7 +1,7 @@
 module Main where
 
-import Test.Hspec
-import Util
+import           Test.Hspec
+import           Util
 
 main :: IO ()
 main = hspec $ do

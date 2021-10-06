@@ -1,6 +1,6 @@
 module Day7 where
 
-import Util (splitOneOf)
+import           Util (splitOneOf)
 
 -- Data structures
 newtype IPv7 = IPv7 [String]
@@ -42,7 +42,7 @@ correspondingABABAB (a : b : _) (c : d : _) = a == d && b == c && a /= c
 -- generic tools
 every :: Int -> [a] -> [a]
 every n (x : xs) = x : every n (drop (n -1) xs)
-every _ [] = []
+every _ []       = []
 
 windows n xs
   | n <= length xs = take n xs : windows n (tail xs)

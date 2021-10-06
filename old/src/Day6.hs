@@ -1,8 +1,8 @@
 module Day6 where
 
-import Data.List (sortBy, transpose)
-import Data.Map (fromListWith, toList)
-import System.IO (Handle, IOMode (ReadMode), hGetContents, withFile)
+import           Data.List (sortBy, transpose)
+import           Data.Map  (fromListWith, toList)
+import           System.IO (Handle, IOMode (ReadMode), hGetContents, withFile)
 
 makeCountMap :: [Char] -> [(Char, Int)]
 makeCountMap inputString =

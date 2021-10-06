@@ -1,7 +1,7 @@
 module Day8 where
 
-import Data.List (transpose)
-import Util (splitOn)
+import           Data.List (transpose)
+import           Util      (splitOn)
 
 newtype Screen = Screen [[Bool]]
 
@@ -16,10 +16,10 @@ countPixelRow = foldr (\b z -> z + fromEnum b) 0
 
 instruct :: Screen -> String -> Screen
 instruct sc instruction = case words instruction of
-  ("rect" : argList) -> rect argList sc
-  ("rotate" : "row" : argList) -> rotateR argList sc
+  ("rect" : argList)              -> rect argList sc
+  ("rotate" : "row" : argList)    -> rotateR argList sc
   ("rotate" : "column" : argList) -> rotateC argList sc
-  _ -> sc
+  _                               -> sc
 
 rect :: [String] -> Screen -> Screen
 rect args (Screen b) =

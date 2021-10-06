@@ -1,7 +1,7 @@
 module Day9 where
 
-import System.IO (putStrLn, readFile)
-import Text.Parsec
+import           System.IO   (putStrLn, readFile)
+import           Text.Parsec
 
 parseOneExpansion = do
   x1 <- manyTill anyChar (try (string "("))
@@ -17,7 +17,7 @@ parseStep x =
   let parseRes = parse parseOneExpansion "MyTag" x
    in case parseRes of
         Right a -> a
-        Left _ -> (x, -1, 0, "")
+        Left _  -> (x, -1, 0, "")
 
 -------
 -- A --
