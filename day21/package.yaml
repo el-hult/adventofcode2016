@@ -1,4 +1,4 @@
-name: aoc2016day21
+name: day21
 version: 0.1.0.0
 
 dependencies:
@@ -18,7 +18,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - aoc2016day21
+    - day21
 
 tests:
   day21-test:
@@ -29,5 +29,5 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - aoc2016day21
+    - day21
     - hspec

@@ -1,20 +1,12 @@
 # Pakcage.yaml is used by hpack to generate the cabal-file
-name:                adventofcode2016
+name:                old
 version:             0.1.0.0
-github:              "githubuser/adventofcode2016"
+github:              "el-hult/adventofcode2016"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2021 Author name here"
-
-# Metadata used when publishing your package
-# synopsis:            Short description of your package
-# category:            Web
-
-# To avoid duplicated efforts in documentation and dealing with the
-# complications of embedding Haddock markup inside cabal files, it is
-# common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/adventofcode2016#readme>
+author:              "Ludvig Hult"
+maintainer:          "ludvig.hult@gmail.com"
+copyright:           "2021 Ludvig Hult"
+description:         Please see the README on GitHub at <https://github.com/el-hult/adventofcode2016#readme>
 
 dependencies:
 - base >= 4.7 && < 5
@@ -22,14 +14,12 @@ dependencies:
 - util
 - mtl
 - containers # LOTS of stuff
-#- bytestring # Data.ByteString
-#- Cabal # Distribution.Utils.MD5
 
 library:
   source-dirs: src
 
 executables:
-  aoc2016:
+  old:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -37,10 +27,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - adventofcode2016
+    - old
 
 tests:
-  adventofcode2016-test:
+  old-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -48,5 +38,5 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - adventofcode2016
+    - old
     - HUnit
