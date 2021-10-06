@@ -1,6 +1,6 @@
 module Day19 where
 
-import Data.List (unfoldr)
+import           Data.List     (unfoldr)
 import qualified Data.Sequence as SS
 
 -- | Compute the solution to part A
