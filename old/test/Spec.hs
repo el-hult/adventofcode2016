@@ -1,6 +1,5 @@
 import Control.Monad.State (execState)
 import Data.Either (Either (Right))
-import Data.List (unfoldr)
 import Data.Map ((!?))
 import qualified Data.Map as M
 import qualified Data.Sequence as SS
@@ -10,7 +9,6 @@ import qualified Day13 as D13
 import qualified Day16 as D16
 import qualified Day17 as D17
 import qualified Day18 as D18
-import qualified Day19 as D19
 import qualified Day2 as D2
 import qualified Day7 as D7
 import qualified Day9 as D9
@@ -162,18 +160,6 @@ testDay18 =
         (@=?) 38 $ D18.solveA 10 D18.initRowTest2
       ]
 
-testDay19 =
-  TestList $
-    map
-      TestCase
-      [ (@=?) 1 $ D19.solveB 2,
-        (@=?) 3 $ D19.solveB 3,
-        (@=?) 1 $ D19.solveB 4,
-        (@=?) 2 $ D19.solveB 5,
-        (@=?) 3 $ D19.solveB 6,
-        (@=?) [(SS.fromList [1, 2, 3, 5, 6], 1), (SS.fromList [1, 2, 3, 6], 2), (SS.fromList [2, 3, 6], 2), (SS.fromList [3, 6], 0), (SS.fromList [3], 1)] (unfoldr D19.stealOne (SS.fromList [1 .. 6], 0))
-      ]
-
 main :: IO ()
 main = do
   counts <-
@@ -187,7 +173,6 @@ main = do
           testDay13,
           testDay16,
           testDay17,
-          testDay18,
-          testDay19
+          testDay18
         ]
   print counts

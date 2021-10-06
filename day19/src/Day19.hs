@@ -13,10 +13,6 @@ solveA k = 2 * (k - a) + 1
 
 solveB k = flip SS.index 0 . fst . last $ unfoldr stealOne (SS.fromList [1 .. k], 0)
 
-main = do
-  print . solveA $ 3001330 --Part A: 1808357
-  print . solveB $ 3001330 --Part B: 1407007
-
 type State = (SS.Seq Int, Int)
 
 -- | Compute the solution to part B
