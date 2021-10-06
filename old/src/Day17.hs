@@ -1,6 +1,10 @@
 {-# LANGUAGE RecordWildCards #-}
 module Day17 where
 
+import Data.Bifunctor (first, second)
+import Data.List (foldl')
+import Util (hashString)
+
 {-|
 Module: Day17
 
@@ -13,10 +17,6 @@ So "stack exec aoc2016 -- 17 +RTS -N1" is advisable, so it only runs on a single
 I guess it would be REALLY interesting to understand the performance, and why it parallelizes so badly.
 
 -}
-
-import Data.Bifunctor (first, second)
-import Data.List (foldl')
-import Util (hashString)
 
 type Pos = (Int,Int) -- ^ Current coordinate. Top left is (1,1) Top right it (4,1). Bottom right is (4,4).
 data Dir = U | D | L | R deriving (Read, Show, Eq)
