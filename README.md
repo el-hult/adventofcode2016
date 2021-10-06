@@ -2,15 +2,20 @@ For solving the AoC2016 advent calendar. http://adventofcode.com/2016
 
 # Instructions
 
-I stole much of my directory structure from (Tomash Aschan)[https://github.com/tomasaschan/advent-of-code-2018].
-The migration to this structure is __in progress_ so only day 1 is in this structure, and the others are standalones that should be run interactively in their respective folders.
+## Code structure and running solvers
 
-To just run a single day, install libraries with `stack setup`, compile all code with `stack build` and then run `stack exec aoc2016 -- <dayNr>` for day `<dayNr>`.
+The current folder structure is a mix between two:
 
-I ran `stack build --test --fast --file-watch --exec "aoc2016 <dayNr>"` where `<dayNr>` is the day, to run test suites and my current day.
+1) A single package called `old` compiling a single executable that can solve many days depending on command line arguments. Run this with `stack build --test --fast --file-watch --exec "old <dayNr>"`.
+   Because there are many days, and at each recompilataion, all previous days are linked into the same executable, this takes silly long time to compile. Also, all the tests are located in a single test executable, so a lot of unnecessary tests are rerun at each recompilation as well. Therefore, some code is migrated to a separate structure.
+2) One package per day called `dayXX` where XX is `19`,`20`,`21` etc. Each package has their own executables, tests etc. To run these, do `stack build dayXX util --test --fast --file-watch --exec "dayXX"`.
 
-You might notice that most days lie in the `old` folder. That is because boring long bild times is yuck, and I wanted shorter ones. So I did the @taschan way and made a single package for each day. Or rather, from day 20 and forward.
-So in that case, there is a new executable, and `stack build --test --fast --file-watch --exec "day21"` is the way to go.
+Except from these packages, there is also a package `util` exposing the module `Util`. Since many days depend on this one, it can be very expensive to run `stack build --file-watch` and edit `util`. All days that use `util` well get recompiled and linked.
+
+If you do *not* want file watch and test cases and so on, because you simply want to run the programs without developing, you can of course just `stack build` and then `stack exec dayXX` or `stack exec old -- XX`.
+
+Many of these ideas were taken from  (Tomash Aschan)[https://github.com/tomasaschan/advent-of-code-2018], but I started out in other ways, hoping to find a simpler solution with fewer moving parts.
+But it seems this is the best setup.
 
 ## Alternative running
 Another way to run the code is with `ghcid`. I find it REALLY nice for these small things. 
@@ -18,14 +23,22 @@ To run Day17 upon saves, and revealing the package HUnit, executing the test-fun
 
 ```powershell
 stack install ghcid
-cd src
+cd old/src
 stack exec ghcid -- --command='stack ghci Day17.hs --package HUnit' --allow-eval --test test
 ```
 
 ## Bugs
 If you by chance get strange output when running the code, consider `stack --color never <filename>`. See https://stackoverflow.com/questions/48597590/why-does-stack-give-wierd-charcter-encoding-in-error-output-on-windows/48597683#48597683. 
 
+# Developing aid
 
+Both `stylish-haskell` and ormolu are good variants for formatting. Ormolu is more opinionated, and what I have used. They both work with HLS for VS Code, but either one is really ok.
+
+```powershell
+stack exec hlint -- .
+stack exec stylish-haskell -- . --recursive --inplace
+stack exec ormolu -- some/file/path.hs --mode inplace
+```
 
 # Profiling Haskell
 
