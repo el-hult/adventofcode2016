@@ -37,7 +37,13 @@ mergeRanges (n1, n2) (n3, n4)
     o2 = maximum [m1, m2, m3, m4]
     rM1 = (m1, m2)
     rM2 = (m3, m4)
-    mergable = (m1 + 1 <= m3 && m4 + 1 <= m3) || (m3 + 1 <= m1 && m2 + 1 <= m3) || (m1 `inRange` rM2) || (m2 `inRange` rM2) || (m3 `inRange` rM1) || (m4 `inRange` rM1)
+    mergable =
+      (m1 + 1 <= m3 && m4 + 1 <= m3)
+        || (m3 + 1 <= m1 && m2 + 1 <= m3)
+        || (m1 `inRange` rM2)
+        || (m2 `inRange` rM2)
+        || (m3 `inRange` rM1)
+        || (m4 `inRange` rM1)
 
 -- | take a SORTED list of ranges, and normalize it to nonoverlapping ranges
 -- Holds a temporary range that it merges on two. When there is a gap, it puts the
