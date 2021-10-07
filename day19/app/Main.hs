@@ -1,6 +1,6 @@
 module Main where
 
-import           Day19
+import Day19
 
 main = do
   print . solveA $ 3001330 --Part A: 1808357

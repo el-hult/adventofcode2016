@@ -1,8 +1,8 @@
 module Day18 where
 
-import           Control.Monad (join)
-import           Data.List     (foldl1', unfoldr)
-import           Util          (windows)
+import Control.Monad (join)
+import Data.List (foldl1', unfoldr)
+import Util (windows)
 
 -- |
 -- Module: Day18
@@ -26,21 +26,21 @@ instance Show Tile where
 instance Read Tile where
   readsPrec _ ('^' : s) = [(Trap, s)]
   readsPrec _ ('.' : s) = [(Safe, s)]
-  readsPrec _ _         = []
+  readsPrec _ _ = []
   readList xs = maybe [] (\l -> [(reverse l, "")]) $ go xs []
     where
-      go "" acc        = Just acc
+      go "" acc = Just acc
       go ('^' : s) acc = go s (Trap : acc)
       go ('.' : s) acc = go s (Safe : acc)
-      go _ acc         = Nothing
+      go _ acc = Nothing
 
 instance Show Row where
-  show (Row [])       = ""
+  show (Row []) = ""
   show (Row (x : xs)) = show x ++ show (Row xs)
 
 rule [Safe, _, Trap] = Trap
 rule [Trap, _, Safe] = Trap
-rule _               = Safe
+rule _ = Safe
 
 nextR (Row bs) = Row . map rule . windows 3 $ padded
   where

@@ -1,25 +1,25 @@
 module Day2 where
 
-import           Data.List  (foldl')
-import           Data.Map   (Map, fromList, member, (!), (!?))
-import           Data.Maybe (mapMaybe)
+import Data.List (foldl')
+import Data.Map (Map, fromList, member, (!), (!?))
+import Data.Maybe (mapMaybe)
 
 data Button = One | Two | Three | Four | Five | Six | Seven | Eight | Nine | Alpha | Bravo | Charlie | Delta
 
 instance Show Button where
-  show One     = "1"
-  show Two     = "2"
-  show Three   = "3"
-  show Four    = "4"
-  show Five    = "5"
-  show Six     = "6"
-  show Seven   = "7"
-  show Eight   = "8"
-  show Nine    = "9"
-  show Alpha   = "A"
-  show Bravo   = "B"
+  show One = "1"
+  show Two = "2"
+  show Three = "3"
+  show Four = "4"
+  show Five = "5"
+  show Six = "6"
+  show Seven = "7"
+  show Eight = "8"
+  show Nine = "9"
+  show Alpha = "A"
+  show Bravo = "B"
   show Charlie = "C"
-  show Delta   = "D"
+  show Delta = "D"
 
 data Instruction = D | U | R | L deriving (Show)
 
@@ -39,7 +39,7 @@ parseInstruction 'U' = Just U
 parseInstruction 'R' = Just R
 parseInstruction 'L' = Just L
 parseInstruction 'D' = Just D
-parseInstruction _   = Nothing
+parseInstruction _ = Nothing
 
 moveOnPad :: NumPad -> Coordinate -> Instruction -> Coordinate
 moveOnPad pad coord instr =

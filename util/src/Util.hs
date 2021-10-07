@@ -1,25 +1,25 @@
 module Util where
 
-import           Control.Monad          (MonadPlus (mplus))
-import           Control.Monad.State    (State, modify, runState)
-import qualified Data.ByteString        as B
-import           Data.Char              (ord)
-import           Data.List              (tails, unfoldr)
-import qualified Data.Map               as M
-import           Distribution.Utils.MD5 (md5, showMD5)
+import Control.Monad (MonadPlus (mplus))
+import Control.Monad.State (State, modify, runState)
+import qualified Data.ByteString as B
+import Data.Char (ord)
+import Data.List (tails, unfoldr)
+import qualified Data.Map as M
+import Distribution.Utils.MD5 (md5, showMD5)
 
 -- https://stackoverflow.com/questions/4978578/how-to-split-a-string-in-haskell
 splitOn :: Eq a => a -> [a] -> [[a]]
 splitOn chr = unfoldr sep
   where
     sep [] = Nothing
-    sep l  = Just . fmap (drop 1) . break (== chr) $ l
+    sep l = Just . fmap (drop 1) . break (== chr) $ l
 
 splitOneOf :: Eq a => [a] -> [a] -> [[a]]
 splitOneOf cs = unfoldr sep
   where
     sep [] = Nothing
-    sep l  = Just . fmap (drop 1) . break (`elem` cs) $ l
+    sep l = Just . fmap (drop 1) . break (`elem` cs) $ l
 
 -- http://stackoverflow.com/questions/7108559/how-to-find-the-frequency-of-characters-in-a-string-in-haskell/7108719#7108719
 -- added in explicit typing. not needed but i find it helping...
@@ -37,7 +37,7 @@ splitLast c s = do
 
 removePunc xs = [x | x <- xs, x `notElem` ",.?!-:;\"\'[]"]
 
-safeHead []      = Nothing
+safeHead [] = Nothing
 safeHead (x : _) = Just x
 
 hashString :: String -> String

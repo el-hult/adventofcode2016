@@ -1,12 +1,12 @@
 module Day5 where
 
-import           Data.Char  (digitToInt)
-import           Data.Maybe (catMaybes)
-import           Util       (hashString)
+import Data.Char (digitToInt)
+import Data.Maybe (catMaybes)
+import Util (hashString)
 
 getMaybeKey :: String -> Maybe Char
 getMaybeKey ('0' : '0' : '0' : '0' : '0' : x : _) = Just x
-getMaybeKey _                                     = Nothing
+getMaybeKey _ = Nothing
 
 makeCandidate :: String -> Int -> String
 makeCandidate i x = i ++ show x
