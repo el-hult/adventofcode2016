@@ -42,7 +42,7 @@ transScreen (Screen b) = Screen (transpose b)
 
 parseRotateArgs :: [String] -> (Int, Int)
 parseRotateArgs w = do
-  let n = read (tail $ tail (w !! 0)) :: Int
+  let n = read (tail $ tail ( head w)) :: Int
   let m = read (w !! 2) :: Int
   (n, m)
 

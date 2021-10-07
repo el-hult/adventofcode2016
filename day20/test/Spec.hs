@@ -10,4 +10,4 @@ spec = do
   it "parses the list" $ makeBlacklist testStr `shouldBe` Blacklist [(0, 2), (4, 8)]
   it "counts the blocked ones correctly" $ totalBlocked (makeBlacklist testStr) `shouldBe` 8
 
-main = hspec $ spec
+main = hspec spec

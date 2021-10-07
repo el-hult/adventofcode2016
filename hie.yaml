@@ -1,0 +1,53 @@
+cradle:
+  stack:
+    - path: "day18"
+      component: "day18:lib"
+    - path: "day18/app"
+      component: "day18:exe:day18"
+    - path: "day18/test"
+      component: "day18:test:day18-test"
+    - path: "day19"
+      component: "day19:lib"
+    - path: "day19/app"
+      component: "day19:exe:day19"
+    - path: "day19/test"
+      component: "day19:test:day19-test"
+    - path: "day20"
+      component: "day20:lib"
+    - path: "day20/app"
+      component: "day20:exe:day20"
+    - path: "day20/test"
+      component: "day20:test:day20-test"
+    - path: "day21"
+      component: "day21:lib"
+    - path: "day21/app"
+      component: "day21:exe:day21"
+    - path: "day21/test"
+      component: "day21:test:day21-test"
+    - path: "old"
+      component: "old:lib"
+    - path: "old/app"
+      component: "old:exe:old"
+    - path: "old/test"
+      component: "old:test:old-test"
+    - path: "util"
+      component: "util:lib"
+    - path: "util/test"
+      component: "util:test:util-test"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

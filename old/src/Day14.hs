@@ -1,4 +1,4 @@
-{-# LANGUAGE Arrows #-}
+{-# LANGUAGE Arrows, TupleSections #-}
 
 -- |
 -- Module      :  Day14
@@ -48,7 +48,7 @@ import Util (hashString, safeHead)
 newtype Circuit a b = Circuit {unCircuit :: a -> (Circuit a b, b)}
 
 instance Cat.Category Circuit where
-  id = Circuit $ \a -> (Cat.id, a)
+  id = Circuit (Cat.id, )
   (.) = dot
     where
       (Circuit cir2) `dot` (Circuit cir1) = Circuit $ \a ->

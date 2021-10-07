@@ -103,8 +103,28 @@ Read on that page for all options. https://haskell-haddock.readthedocs.io/en/lat
 
 ```powershell
 stack install haddock
-stack exec haddock -- --html  src/Day14.hs
+stack exec haddock -- --html  old/src/Day14.hs
 open Day14.html
 ```
 
 I guess one can set it up smarter, with some dedicated output folder and so on... but wth.
+
+
+### IDE support
+I have been using VSCode with the haskell language server. It is generally good, can find, parse and present haddock snippets, autoformat with `ormolu` or `styclish-haskell` and more.
+There is one problem though. By default, the build system (`stack` in my case) is supposed to explain to [hie-bios](https://github.com/haskell/hie-bios`) how various parts of the project fits together. When there are several `Main` modules in the stack project, this mechanism fails. This can be fixed, by manually configuring a [multi-cradle](https://github.com/haskell/hie-bios#multi-cradle) project so that each project package is handeled with its own `Main`-module.
+
+Therefore, the `hie.yaml` must be carried around all the time. It is a bummer, but it is acceptable, I guess.
+
+If you get the error 
+```
+Multi Cradle: No prefixes matched
+pwd: C:\Users\Ludvig\Google Drive\Hobbyprojekt 2021\adventofcode2016
+filepath: C:\Users\Ludvig\Google Drive\Hobbyprojekt 2021\adventofcode2016\day18\app\Main.hs
+prefixes:
+("./old",Stack {component = Just "old:exe:old", stackYaml = Nothing})
+("./day19",Stack {component = Just "day19:exe:day19", stackYaml = Nothing})
+("./day20",Stack {component = Just "day20:exe:day20", stackYaml = Nothing})
+("./day21",Stack {component = Just "day21:exe:day21", stackYaml = Nothing})
+```
+or similar, it means that the file you have opened does not match any of the file path prefixes (e.g. folders) in the multi-cradle setup. Maybe you added a new package, without adding a hie cradle configuration?

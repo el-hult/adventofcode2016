@@ -2,6 +2,7 @@ module Day9 where
 
 import System.IO (putStrLn, readFile)
 import Text.Parsec
+import Data.Bifunctor (first)
 
 parseOneExpansion = do
   x1 <- manyTill anyChar (try (string "("))
@@ -24,14 +25,14 @@ parseStep x =
 -------
 
 applyStep :: (String, Int, Int, String) -> ([Char], [Char])
-applyStep (head, i1, i2, tail) = (head ++ concat ((replicate i2 (take i1 tail))), drop i1 tail)
+applyStep (head, i1, i2, tail) = (head ++ concat (replicate i2 (take i1 tail)), drop i1 tail)
 
 goTakeStep :: String -> ([Char], [Char])
 goTakeStep = applyStep . parseStep
 
 takeManySteps :: ([Char], [Char]) -> ([Char], [Char])
 takeManySteps (s1, "") = (s1, "")
-takeManySteps (s1, s2) = takeManySteps (s1 ++ fst (goTakeStep s2), snd (goTakeStep s2))
+takeManySteps (s1, s2) = takeManySteps (first (s1 ++) (goTakeStep s2))
 
 processString :: String -> String
 processString s = fst (takeManySteps ("", s))
