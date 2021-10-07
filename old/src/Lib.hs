@@ -11,7 +11,6 @@ import qualified Day14 as D14
 import qualified Day15 as D15
 import qualified Day16 as D16
 import qualified Day17 as D17
-import qualified Day18 as D18
 import qualified Day2 as D2
 import qualified Day3 as D3
 import qualified Day4 as D4
@@ -40,8 +39,7 @@ dayRunners =
       (14, D14.main),
       (15, D15.main),
       (16, D16.main),
-      (17, D17.main),
-      (18, D18.main)
+      (17, D17.main)
     ]
 
 runDay s = fromMaybe (putStrLn "invalid day") (readMaybe s >>= flip M.lookup dayRunners)

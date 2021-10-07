@@ -8,7 +8,6 @@ import qualified Day12 as D12
 import qualified Day13 as D13
 import qualified Day16 as D16
 import qualified Day17 as D17
-import qualified Day18 as D18
 import qualified Day2 as D2
 import qualified Day7 as D7
 import qualified Day9 as D9
@@ -151,14 +150,6 @@ testDay17 =
         --,830 @=?  D17.solveB initialStateTest3 -- VERY SLOW test. Takes several minutes. So skip them for the most part.
       ]
 
-testDay18 =
-  TestList $
-    map
-      TestCase
-      [ (@=?) "..^^.\n.^^^^\n^^..^\n" $ unlines . map show . take 3 . iterate D18.nextR $ D18.initRowTest1,
-        (@=?) ".^^.^.^^^^\n^^^...^..^\n^.^^.^.^^.\n..^^...^^^\n.^^^^.^^.^\n^^..^.^^..\n^^^^..^^^.\n^..^^^^.^^\n.^^^..^.^^\n^^.^^^..^^\n" $ unlines . map show . take 10 . iterate D18.nextR $ D18.initRowTest2,
-        (@=?) 38 $ D18.solveA 10 D18.initRowTest2
-      ]
 
 main :: IO ()
 main = do
@@ -172,7 +163,6 @@ main = do
           testDay12,
           testDay13,
           testDay16,
-          testDay17,
-          testDay18
+          testDay17
         ]
   print counts

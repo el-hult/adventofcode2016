@@ -53,7 +53,3 @@ initRowTest1 = Row . read $ "..^^."
 initRowTest2 = Row . read $ ".^^.^.^^^^"
 
 solveA n = length . filter (== Safe) . join . map unRow . take n . iterate nextR
-
-main = do
-  print $ solveA 40 initRow -- 1913
-  print $ solveA 400000 initRow -- 19 993 564
