@@ -30,6 +30,13 @@ stack exec ghcid -- --command='stack ghci Day17.hs --package HUnit' --allow-eval
 ## Bugs
 If you by chance get strange output when running the code, consider `stack --color never <filename>`. See https://stackoverflow.com/questions/48597590/why-does-stack-give-wierd-charcter-encoding-in-error-output-on-windows/48597683#48597683. 
 
+If the code crashes with an error like `<stderr>: commitAndReleaseBuffer: invalid argument (invalid character)` it is because the shell wont accept utf8 characters https://stackoverflow.com/questions/63746826/what-might-cause-commitandreleasebuffer-invalid-argument-invalid-character .
+I could resolve this with 
+```powershell
+[console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encodi
+```
+as sinspired from https://github.com/PowerShell/PowerShell/issues/7233 and I guess the solution depends on the PS version. I have 5.1 currently.
+
 # Developing aid
 
 Both `stylish-haskell` and ormolu are good variants for formatting. Ormolu is more opinionated, and what I have used. They both work with HLS for VS Code, but either one is really ok.
@@ -48,7 +55,7 @@ This is well developed, but good tutorials are hard to come by. I've seen this r
 - Stack tool profiling options. https://docs.haskellstack.org/en/stable/GUIDE/#debugging 
 - Pasing other options to GHC when calling Stack https://docs.haskellstack.org/en/stable/GUIDE/#ghc-options
 - GHC opn profiling https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html
-
+- Profiling via Criterion and Stack. There is No full tutorial, bu combine https://stackoverflow.com/questions/37485522/how-to-use-criterion-with-stack with http://www.serpentine.com/criterion/tutorial.html to get somewhere.
 
 ### Time profiling
 ```powershell
@@ -109,10 +116,18 @@ open Day14.html
 
 I guess one can set it up smarter, with some dedicated output folder and so on... but wth.
 
+### Benchmarks
+Benchmarks are made by writing custom programs, and denote them as "bench" build targets. See Day22 for an example.
+The program itself is responsible for reporting relevant output via stdOut or writing reports to file.
+One framework that helps in that is Criterion. http://www.serpentine.com/criterion/tutorial.html
+
 
 ### IDE support
-I have been using VSCode with the haskell language server. It is generally good, can find, parse and present haddock snippets, autoformat with `ormolu` or `styclish-haskell` and more.
-There is one problem though. By default, the build system (`stack` in my case) is supposed to explain to [hie-bios](https://github.com/haskell/hie-bios`) how various parts of the project fits together. When there are several `Main` modules in the stack project, this mechanism fails. This can be fixed, by manually configuring a [multi-cradle](https://github.com/haskell/hie-bios#multi-cradle) project so that each project package is handeled with its own `Main`-module.
+I have been using VSCode with the haskell language server. It is generally good, can find, parse and present haddock snippets, autoformat with `ormolu` or `stylish-haskell` and more.
+There is one problem though. By default, the build system (`stack` in my case) is supposed to explain to [hie-bios](https://github.com/haskell/hie-bios`) how various parts of the project fits together.
+When there are several `Main` modules in the stack project, this mechanism fails.
+This can be fixed, by manually configuring a [multi-cradle](https://github.com/haskell/hie-bios#multi-cradle) project so that each project package is handeled with its own `Main`-module.
+You need to write the name of a build target there, so call `stack ide build-target` to list them. That is a way to debug the `package.yaml` files as well. :)
 
 Therefore, the `hie.yaml` must be carried around all the time. It is a bummer, but it is acceptable, I guess.
 

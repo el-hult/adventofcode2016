@@ -1,0 +1,46 @@
+name: day22
+version: 0.1.0.0
+
+dependencies:
+- base >= 4.7 && < 5
+- util
+- lens
+- containers
+
+library:
+  source-dirs: src
+
+executables:
+  day22:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - day22
+
+tests:
+  day22-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - day22
+    - hspec
+
+benchmarks:
+  day22-bench:
+    main:                Bench.hs
+    source-dirs:         bench
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - day22
+    - criterion
