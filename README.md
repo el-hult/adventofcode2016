@@ -1,5 +1,7 @@
 For solving the AoC2016 advent calendar. http://adventofcode.com/2016
 
+Project structure inspired by (Tomash Aschan)[https://github.com/tomasaschan/advent-of-code-2018].
+
 # Instructions
 
 In 2025, I installed Stack using GHCUp https://www.haskell.org/ghcup/, so that HLS support worked nicer in my IDE (through GHCUp).
@@ -8,54 +10,21 @@ I also udated the stackage resolver so it uses a newer version of GHC that I act
 ## Code structure and running solvers
 
 One package per day called `dayXX`.
-Each package has their own executables, tests etc. 
-To run these, do `stack build dayXX util --test --fast --file-watch --exec "dayXX"`.
+Each package has their own executables, tests etc. Run with `stack run dayXX` or `stack test dayXX`.
 
-Except from these packages, there is also a package `util` exposing the module `Util`. Since many days depend on this one, it can be very expensive to run `stack build --file-watch` and edit `util`. All days that use `util` will get recompiled and linked.
+In development, you might want `stack build dayXX util --test --fast --file-watch --exec "dayXX"` instead.
 
-If you do *not* want file watch and test cases and so on, because you simply want to run the programs without developing, you can of course just `stack build` and then `stack exec dayXX` or `stack exec old -- XX`.
-
-Many of these ideas were taken from  (Tomash Aschan)[https://github.com/tomasaschan/advent-of-code-2018], but I started out in other ways, hoping to find a simpler solution with fewer moving parts.
-But it seems this is the best setup.
-
-## Alternative running
-Another way to run the code is with `ghcid`. I find it REALLY nice for these small things. 
-To run Day17 upon saves, and revealing the package HUnit, executing the test-function and also all eval-expresions run the stuff below. See also https://github.com/ndmitchell/ghcid 
-
-```powershell
-stack install ghcid
-cd old/src
-stack exec ghcid -- --command='stack ghci Day17.hs --package HUnit' --allow-eval --test test
-```
-
-## Bugs
-If you by chance get strange output when running the code, consider `stack --color never <filename>`. See https://stackoverflow.com/questions/48597590/why-does-stack-give-wierd-charcter-encoding-in-error-output-on-windows/48597683#48597683. 
-
-If the code crashes with an error like `<stderr>: commitAndReleaseBuffer: invalid argument (invalid character)` it is because the shell wont accept utf8 characters https://stackoverflow.com/questions/63746826/what-might-cause-commitandreleasebuffer-invalid-argument-invalid-character .
-I could resolve this with 
-```powershell
-[console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
-```
-as inspired from https://github.com/PowerShell/PowerShell/issues/7233 and I guess the solution depends on the PS version. I have 5.1 currently.
-You might want to even put that in you `profile.ps` file, because it is a good idea in general, I think.
-
-### ReadOnly folders
-
-By some wierd reason, Stack creates temporary folders that have the read only flag set. So at next run, it cannot remove these folders.
-
-On windows, you can run ` attrib -R /S /D` to remove the readonly flag on all files and folders below the current folder. And then stack will work again.
+There is also a package `util` exposing the module `Util`. 
 
 # Developing aid
 
 ## Formatters
 
-Both `stylish-haskell` and `ormolu` are good formatters. Ormolu is more opinionated, and what I have used. They both work with HLS for VS Code, but either one is really ok.
-
-```powershell
-stack exec hlint -- .
-stack exec stylish-haskell -- . --recursive --inplace
+Use `ormolu`. It is opinionated, and works with HLS for VS Code. Command line call it using
+```shell
 stack exec ormolu -- some/file/path.hs --mode inplace
 ```
+
 
 ## Profiling Haskell
 
@@ -124,8 +93,6 @@ stack exec haddock -- --html  old/src/Day14.hs
 open Day14.html
 ```
 
-I guess one can set it up smarter, with some dedicated output folder and so on... but wth.
-
 ## Benchmarks
 Benchmarks are made by writing custom programs, and denote them as "bench" build targets. See Day22 for an example.
 The program itself is responsible for reporting relevant output via stdOut or writing reports to file.
@@ -158,7 +125,7 @@ I have been using VSCode with the haskell language server. It is generally good,
 There is one problem though. By default, the build system (`stack` in my case) is supposed to explain to [hie-bios](https://github.com/haskell/hie-bios`) how various parts of the project fits together.
 When there are several `Main` modules in the stack project, this mechanism fails.
 This can be fixed, by manually configuring a [multi-cradle](https://github.com/haskell/hie-bios#multi-cradle) project so that each project package is handeled with its own `Main`-module.
-You need to write the name of a build target there, so call `stack ide build-target` to list them. That is a way to debug the `package.yaml` files as well. :)
+You need to write the name of a build target there, so call `stack ide build-target` to list them. That is a way to debug the `package.yaml` files as well.
 
 Therefore, the `hie.yaml` must be carried around all the time. It is a bummer, but it is acceptable, I guess.
 
