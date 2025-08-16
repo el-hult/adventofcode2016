@@ -3,24 +3,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TupleSections #-}
 
-module Day22 where
-
-import Control.Exception (assert)
-import Control.Lens
-import qualified Control.Lens.Operators as B1
-import Control.Monad (MonadPlus (mzero), guard)
-import Data.List (nub)
-import Data.Map (Map, fromList)
-import Data.Maybe (fromMaybe)
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Debug.Trace (trace)
-import Text.Read (readEither)
-import Util
-
---
---
--- Solutions to Day 22
+-- | Solutions to Day 22
 --
 -- # Part A
 -- Here, we are asked to read a list of data nodes, and check pairwise if they are a "viable" pair. I.e. if
@@ -29,6 +12,19 @@ import Util
 --     3) 0 < used A
 --
 -- it is unclear if they are considered an ordered pair or not. I.e. if this is fulfilled both for (A,B) and (B,A), does that count as two occurances?
+module Day22 where
+
+import Control.Lens
+import Control.Monad (MonadPlus (mzero), guard)
+import Data.List (nub)
+import Data.Map (Map)
+import qualified Data.Map.Lazy as M
+import Data.Maybe (fromMaybe)
+import Data.Set (Set)
+import qualified Data.Set as Set
+import qualified SkewHeap as SH
+import Text.Read (readEither)
+import Util
 
 data DataNode = -- | A node in the data center at coordinate x y holding @used@ data, with a capacity of @size@
   DataNode {x :: Int, y :: Int, size :: Int, used :: Int}
@@ -106,17 +102,21 @@ makeLenses ''SolverState
 -- | Generate the initial parameters, from the input data
 genInit :: [DataNode] -> (SolverState, Coord)
 genInit lst =
-  let board = fromList . map (\DataNode {x, y, size, used} -> ((x, y), (size, used))) $ lst
+  let board' = M.fromList . map (\DataNode {x, y, size, used} -> ((x, y), (size, used))) $ lst
       maxX = maximum $ map x lst
       maxY = maximum $ map y lst
-   in (S {_ptr = (maxX, 0), _board = board}, (maxX, maxY))
+   in (S {_ptr = (maxX, 0), _board = board'}, (maxX, maxY))
 
+moveCoord :: Dir -> Coord -> Coord
 moveCoord D (x, y) = (x, y + 1)
 moveCoord U (x, y) = (x, y -1)
 moveCoord L (x, y) = (x -1, y)
 moveCoord R (x, y) = (x + 1, y)
 
 -- | The test state in the example
+maxYtest0 :: Int
+maxXtest0 :: Int
+testState0 :: SolverState
 (testState0, (maxXtest0, maxYtest0)) =
   genInit
     [ DataNode 0 0 10 8,
@@ -131,6 +131,9 @@ moveCoord R (x, y) = (x + 1, y)
     ]
 
 -- | A really small test state to play with
+testState1 :: SolverState
+maxXtest1 :: Int
+maxYtest1 :: Int
 (testState1, (maxXtest1, maxYtest1)) =
   genInit
     [ DataNode 0 0 10 5,
@@ -141,8 +144,7 @@ moveCoord R (x, y) = (x + 1, y)
 
 --- | Try to make a move. If the move is invalid, return Nothing
 -- >>> doMove (1,0) R testState1
--- WAS Nothing
--- NOW Nothing
+-- Nothing
 
 -- >>> doMove (1,0) L testState1
 -- Just (S {_ptr = (0,0), _board = fromList [((0,0),(10,10)),((0,1),(10,5)),((1,0),(10,0)),((1,1),(10,10))]})
@@ -161,10 +163,10 @@ doMove fromC dir s0 = do
 
 -- | A general BFS traverser, that returns all nodes in the graph, together with the number of steps to take there
 -- >>> genNodes n = if  abs n < 3 then [n+1,n-1] else []
--- >>> bfs2 genNodes 1
+-- >>> bfsTraverse genNodes 1
 -- [(0,1),(1,2),(1,0),(2,3),(2,-1),(3,-2),(4,-3)]
-bfs2 :: forall a. Ord a => (a -> [a]) -> a -> [(Int, a)]
-bfs2 genNodes start = go [start] Set.empty 0
+bfsTraverse :: forall a. Ord a => (a -> [a]) -> a -> [(Int, a)]
+bfsTraverse genNodes start = go [start] Set.empty 0
   where
     go :: [a] -> Set a -> Int -> [(Int, a)]
     go [] _ _ = []
@@ -172,16 +174,6 @@ bfs2 genNodes start = go [start] Set.empty 0
       let newFront = nub . filter (`notElem` visited) . concatMap genNodes $ front
           newVisited = foldr Set.insert visited front
        in map (n,) front ++ go newFront newVisited (n + 1)
-
--- | The blackbird combinator. Also called B1.
--- take a binary function and a unary function and make a pipeline for them
-(.:) :: (b -> c) -> (a1 -> a2 -> b) -> a1 -> a2 -> c
-(.:) = (.) . (.)
-
--- | A takeWhile that also picks the element that is the one fulfilling the predicate.
-takeUpTo p xs =
-  let firstPassIdx = ((snd . head . filter (p . fst)) .: zip) xs [1 ..]
-   in take firstPassIdx xs
 
 -- | bfs maxX maxY a isFinish
 -- Do a breadth first search in the state space of SolverStates.
@@ -191,7 +183,77 @@ takeUpTo p xs =
 -- >>> bfs maxXtest0 maxYtest0 testState0 isFinalState
 -- 7
 bfs :: Int -> Int -> SolverState -> (SolverState -> Bool) -> Int
-bfs maxX maxY a isFinish = subtract 1 . fst . head . filter (isFinish . snd) $ bfs2 (generateNeighbors maxX maxY) a
+bfs maxX maxY a isFinish = subtract 1 . fst . head . filter (isFinish . snd) $ bfsTraverse (generateNeighbors maxX maxY) a
+
+-- | Compute the taxicab dinstande between points
+l1Distance :: Coord -> Coord -> Int
+l1Distance (a, b) (c, d) = abs (a - c) + abs (b - d)
+
+myHeuristic :: SolverState -> Double
+myHeuristic ss = realToFrac $ l1Distance (ss ^. ptr) (0, 0)
+
+-- >>> starFind maxXtest0 maxYtest0 testState0
+starFind :: Int -> Int -> SolverState -> Int
+starFind maxX maxY startState = subtract 1 . length $ aStar (generateNeighbors maxX maxY) myHeuristic startState isFinalState
+
+-- >>> infinity
+-- Infinity
+infinity :: Double
+infinity = read "Infinity"
+
+getInf :: Ord a => a -> Map a Double -> Double
+getInf = M.findWithDefault infinity
+
+-- | Search for the shortest path between a start and a goal-node
+-- Returns a list that represents the path from start to goal, in reverse.
+aStar ::
+  forall a.
+  Ord a =>
+  -- | the method that creates new nodes
+  (a -> [a]) ->
+  -- | The heuristic. Often called `h` in the litterature. use double, as they allow infinity
+  (a -> Double) ->
+  -- | the starting state
+  a ->
+  -- | a predicate for whether we have come to the goal or not
+  (a -> Bool) ->
+  -- | a path from start to goal,
+  [a]
+aStar genNewNodes scoreNode start isDone =
+  go (SH.singleton (scoreNode start, start)) (Set.singleton start) M.empty (M.singleton start 0) (M.singleton start (scoreNode start))
+  where
+    go ::
+      -- | The skewHeap has pairs where the first component is the fScore, which we order by
+      SH.SkewHeap (Double, a) ->
+      -- | The set is a list of all visited positions to prevent loops.
+      Set a ->
+      Map a a ->
+      Map a Double ->
+      Map a Double ->
+      [a]
+    go openSet discovered cameFrom gScore fScore
+      | SH.null openSet = error "No path to goal!"
+      | isDone current = trackToCurrent
+      | otherwise = go newOpen newDiscovered newFrom newGScore newFScore
+      where
+        -- pop the best node to expand
+        (current, _) = case SH.extractMin openSet of
+          Nothing -> error "Bad code? This should NOT be empty"
+          Just ((_, currentNode), val) -> (currentNode, val)
+        gCurrent = getInf current gScore
+        toUpdate = map (\(g, n) -> (g, g + scoreNode n, n)) . filter (\(g, n) -> g <= getInf n gScore) . map (gCurrent + 1,) $ genNewNodes current
+        toAdd = filter (\(_, _, n) -> n `notElem` discovered) toUpdate
+        -- These loops can be combined if im clever
+        newOpen = foldl (flip SH.insert) openSet . map (\(_, f, n) -> (f, n)) $ toAdd
+        newDiscovered = foldl (flip Set.insert) discovered . map (\(_, _, n) -> n) $ toAdd
+        -- These too...
+        newFrom = foldl (\m n -> M.insert n current m) cameFrom . map (\(_, _, n) -> n) $ toUpdate
+        newGScore = foldl (\m (g, k) -> M.insert k g m) gScore . map (\(g, _, n) -> (g, n)) $ toUpdate
+        newFScore = foldl (\m (f, k) -> M.insert k f m) fScore . map (\(_, f, n) -> (f, n)) $ toUpdate
+        trackToCurrent = go2 [current]
+          where
+            go2 [] = error "you messed up f-head"
+            go2 (x : xs) = cameFrom M.! x : x : xs
 
 -- | generateNeighbors maxX maxY ss
 -- Generate all neighbor states to the solver state `ss`, and check that all moves are valid

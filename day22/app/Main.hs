@@ -7,9 +7,9 @@ solveA :: [DataNode] -> String
 solveA xs = show . length . filter (== True) $ [isViablePair n1 n2 | n1 <- xs, n2 <- xs]
 
 solveB :: [DataNode] -> String
-solveB dns =
-  let (s0, (maxX, maxY)) = genInit dns
-      mSteps = bfs maxX maxY s0 isFinalState
+solveB dataNodes =
+  let (s0, (maxX, maxY)) = genInit dataNodes
+      mSteps = starFind maxX maxY s0
    in show mSteps
 
 main :: IO ()

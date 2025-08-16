@@ -21,7 +21,7 @@ main = hspec $ do
       lineToNode "/dev/grid/node-x24-y9   501T  499T     2T   99%" `shouldBe` Right DataNode {x = 24, y = 9, size = 501, used = 499}
     describe "Can handle the state" $ do
       it "Move a simple one" $ do
-        doMove (0, 0) D (S {_ptr = (0, 0), _board = fromList [((0, 0), (3, 3)), ((0, 1), (6, 3))]}) `shouldBe` (S {_ptr = (0, 1), _board = fromList [((0, 0), (3, 0)), ((0, 1), (6, 6))]})
+        doMove (0, 0) D (S {_ptr = (0, 0), _board = fromList [((0, 0), (3, 3)), ((0, 1), (6, 3))]}) `shouldBe` Just (S {_ptr = (0, 1), _board = fromList [((0, 0), (3, 0)), ((0, 1), (6, 6))]})
     before withInputFile $
-      context "with the input file" $
+      context "With the input file" $
         it "Can parse the whole input file with no fails" (\content -> all (isRight . lineToNode) (drop 2 . lines $ content))
