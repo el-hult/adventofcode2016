@@ -29,3 +29,9 @@ hpc_*
 *.json
 *.png
 *.html
+
+# OSX
+.DS_Store
+
+# input files
+inputs/

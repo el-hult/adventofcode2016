@@ -1,0 +1,21 @@
+name: day13
+version: 0.1.0.0
+
+dependencies:
+- base >= 4.7 && < 5
+- util
+
+executables:
+  day13:
+    main:                Main.hs
+    source-dirs:         app
+    dependencies:
+    - day13
+
+tests:
+  day13-test:
+    main:                Spec.hs
+    source-dirs:         test
+    dependencies:
+    - day13
+    - HUnit

@@ -1,0 +1,21 @@
+name: day08
+version: 0.1.0.0
+
+dependencies:
+- base >= 4.7 && < 5
+- util
+
+executables:
+  day08:
+    main:                Main.hs
+    source-dirs:         app
+    dependencies:
+    - day08
+
+tests:
+  day08-test:
+    main:                Spec.hs
+    source-dirs:         test
+    dependencies:
+    - day08
+    - HUnit

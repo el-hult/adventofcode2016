@@ -1,0 +1,13 @@
+name: day14
+version: 0.1.0.0
+
+dependencies:
+- base >= 4.7 && < 5
+- util
+
+executables:
+  day14:
+    main:                Main.hs
+    source-dirs:         app
+    dependencies:
+    - day14

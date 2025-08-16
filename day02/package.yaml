@@ -1,0 +1,25 @@
+name: day02
+version: 0.1.0.0
+
+dependencies:
+- base >= 4.7 && < 5
+
+library:
+  source-dirs: src
+  dependencies:
+  - containers
+
+executables:
+  day02:
+    main:                Main.hs
+    source-dirs:         app
+    dependencies:
+    - day02
+
+tests:
+  day02-test:
+    main:                Spec.hs
+    source-dirs:         test
+    dependencies:
+    - day02
+    - HUnit

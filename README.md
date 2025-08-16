@@ -2,15 +2,16 @@ For solving the AoC2016 advent calendar. http://adventofcode.com/2016
 
 # Instructions
 
+In 2025, I installed Stack using GHCUp https://www.haskell.org/ghcup/, so that HLS support worked nicer in my IDE (through GHCUp).
+I also udated the stackage resolver so it uses a newer version of GHC that I actually could download and install on MacOS.
+
 ## Code structure and running solvers
 
-The current folder structure is a mix between two:
+One package per day called `dayXX`.
+Each package has their own executables, tests etc. 
+To run these, do `stack build dayXX util --test --fast --file-watch --exec "dayXX"`.
 
-1) A single package called `old` compiling a single executable that can solve many days depending on command line arguments. Run this with `stack build --test --fast --file-watch --exec "old <dayNr>"`.
-   Because there are many days, and at each recompilataion, all previous days are linked into the same executable, this takes silly long time to compile. Also, all the tests are located in a single test executable, so a lot of unnecessary tests are rerun at each recompilation as well. Therefore, some code is migrated to a separate structure.
-2) One package per day called `dayXX` where XX is `19`,`20`,`21` etc. Each package has their own executables, tests etc. To run these, do `stack build dayXX util --test --fast --file-watch --exec "dayXX"`.
-
-Except from these packages, there is also a package `util` exposing the module `Util`. Since many days depend on this one, it can be very expensive to run `stack build --file-watch` and edit `util`. All days that use `util` well get recompiled and linked.
+Except from these packages, there is also a package `util` exposing the module `Util`. Since many days depend on this one, it can be very expensive to run `stack build --file-watch` and edit `util`. All days that use `util` will get recompiled and linked.
 
 If you do *not* want file watch and test cases and so on, because you simply want to run the programs without developing, you can of course just `stack build` and then `stack exec dayXX` or `stack exec old -- XX`.
 
@@ -33,13 +34,22 @@ If you by chance get strange output when running the code, consider `stack --col
 If the code crashes with an error like `<stderr>: commitAndReleaseBuffer: invalid argument (invalid character)` it is because the shell wont accept utf8 characters https://stackoverflow.com/questions/63746826/what-might-cause-commitandreleasebuffer-invalid-argument-invalid-character .
 I could resolve this with 
 ```powershell
-[console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encodi
+[console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 ```
-as sinspired from https://github.com/PowerShell/PowerShell/issues/7233 and I guess the solution depends on the PS version. I have 5.1 currently.
+as inspired from https://github.com/PowerShell/PowerShell/issues/7233 and I guess the solution depends on the PS version. I have 5.1 currently.
+You might want to even put that in you `profile.ps` file, because it is a good idea in general, I think.
+
+### ReadOnly folders
+
+By some wierd reason, Stack creates temporary folders that have the read only flag set. So at next run, it cannot remove these folders.
+
+On windows, you can run ` attrib -R /S /D` to remove the readonly flag on all files and folders below the current folder. And then stack will work again.
 
 # Developing aid
 
-Both `stylish-haskell` and ormolu are good variants for formatting. Ormolu is more opinionated, and what I have used. They both work with HLS for VS Code, but either one is really ok.
+## Formatters
+
+Both `stylish-haskell` and `ormolu` are good formatters. Ormolu is more opinionated, and what I have used. They both work with HLS for VS Code, but either one is really ok.
 
 ```powershell
 stack exec hlint -- .
@@ -47,14 +57,14 @@ stack exec stylish-haskell -- . --recursive --inplace
 stack exec ormolu -- some/file/path.hs --mode inplace
 ```
 
-# Profiling Haskell
+## Profiling Haskell
 
 This is well developed, but good tutorials are hard to come by. I've seen this relevant reading:
 
 - Video tutorial with GHC https://www.youtube.com/watch?v=pwcEUdf4Qmk
 - Stack tool profiling options. https://docs.haskellstack.org/en/stable/GUIDE/#debugging 
 - Pasing other options to GHC when calling Stack https://docs.haskellstack.org/en/stable/GUIDE/#ghc-options
-- GHC opn profiling https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html
+- GHC own profiling https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/profiling.html
 - Profiling via Criterion and Stack. There is No full tutorial, bu combine https://stackoverflow.com/questions/37485522/how-to-use-criterion-with-stack with http://www.serpentine.com/criterion/tutorial.html to get somewhere.
 
 ### Time profiling
@@ -83,7 +93,7 @@ stack exec hp2pretty -- aoc2016.EXE.hp; open aoc2016.EXE.svg
 
 This is a cost centre based report. change the `-hc` to `-hT` or `-hy` to get varous report types.
 
-### Code coverage
+## Code coverage
 The standard setup described in 
 https://docs.haskellstack.org/en/stable/coverage/#code-coverage
 is not suitable for this package, since the library is compiled into the executable.
@@ -104,7 +114,7 @@ stack test --ghc-options -fhpc
 open Main.hs.html
 ```
 
-### Documentation
+## Documentation
 Some Modules (e.g. Day 14) script have documentation in them. Compile them with Haddock.
 Read on that page for all options. https://haskell-haddock.readthedocs.io/en/latest/index.html
 
@@ -116,13 +126,34 @@ open Day14.html
 
 I guess one can set it up smarter, with some dedicated output folder and so on... but wth.
 
-### Benchmarks
+## Benchmarks
 Benchmarks are made by writing custom programs, and denote them as "bench" build targets. See Day22 for an example.
 The program itself is responsible for reporting relevant output via stdOut or writing reports to file.
 One framework that helps in that is Criterion. http://www.serpentine.com/criterion/tutorial.html
 
+## Debugging
 
-### IDE support
+the GHCi debugger is quite nice. Run `stack ghci`, then load modules of choice, set breakpoints with `:break`, show available variables with `:show bindings` etc. 
+
+See [The documentation on GHCi debugging](https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/ghci.html#the-ghci-debugger)
+
+Trace debugging can be helpful, see `Debug.Trace` at https://hackage.haskell.org/package/base-4.16.0.0/docs/Debug-Trace.html#v:trace
+
+Example:
+
+```haskell
+import Debug.Trace
+fib :: Integer -> Integer
+fib 0 = trace "0 => 0" $ 0
+fib 1 = trace "1 => 1" $ 1
+fib n =
+   let input = n
+       output = fib (n-1) + fib (n-2)
+   in trace (show input ++ " => " ++ show output) $ output
+```
+
+
+## IDE support
 I have been using VSCode with the haskell language server. It is generally good, can find, parse and present haddock snippets, autoformat with `ormolu` or `stylish-haskell` and more.
 There is one problem though. By default, the build system (`stack` in my case) is supposed to explain to [hie-bios](https://github.com/haskell/hie-bios`) how various parts of the project fits together.
 When there are several `Main` modules in the stack project, this mechanism fails.

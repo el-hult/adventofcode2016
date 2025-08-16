@@ -1,0 +1,27 @@
+name: day01
+version: 0.1.0.0
+
+dependencies:
+- base >= 4.7 && < 5
+- util
+- mtl
+- parsec
+
+library:
+  source-dirs: src
+
+
+executables:
+  day01:
+    main:                Main.hs
+    source-dirs:         app
+    dependencies:
+    - day01
+
+tests:
+  day01-test:
+    main:                Spec.hs
+    source-dirs:         test
+    dependencies:
+    - day01
+    - HUnit

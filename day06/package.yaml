@@ -1,0 +1,10 @@
+name: day06
+version: 0.1.0.0
+
+executables:
+  day06:
+    main:                Main.hs
+    source-dirs:         app
+    dependencies:
+    - containers
+    - base

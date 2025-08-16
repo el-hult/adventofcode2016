@@ -1,0 +1,24 @@
+name: day17
+version: 0.1.0.0
+
+dependencies:
+- base >= 4.7 && < 5
+- util
+
+library:
+  source-dirs: src
+
+executables:
+  day17:
+    main:                Main.hs
+    source-dirs:         app
+    dependencies:
+    - day17
+
+tests:
+  day17-test:
+    main:                Test.hs
+    source-dirs:         test
+    dependencies:
+    - day17
+    - HUnit

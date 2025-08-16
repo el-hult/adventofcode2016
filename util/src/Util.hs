@@ -95,6 +95,18 @@ insertAt i xs x =
       b = drop i xs
    in a ++ [x] ++ b
 
+
+-- | The blackbird combinator. Also called B1.
+-- take a binary function and a unary function and make a pipeline for them
+(.:) :: (b -> c) -> (a1 -> a2 -> b) -> a1 -> a2 -> c
+(.:) = (.) . (.)
+
+-- | A takeWhile that also picks the element that is the one fulfilling the predicate.
+takeUpTo :: (a -> Bool) -> [a] -> [a]
+takeUpTo p xs =
+  let firstPassIdx = ((snd . head . filter (p . fst)) .: zip) xs [1 ..]
+   in take firstPassIdx xs
+
 ------------------------------------------------------------------------------------
 -- Inspired or stolen from https://hackage.haskell.org/package/monad-loops-0.4.3/docs/Control-Monad-Loops.html
 
@@ -119,9 +131,9 @@ whileM' p f = go
       x <- p
       if x
         then do
-          x <- f
-          xs <- go
-          return (x : xs)
+          y <- f
+          ys <- go
+          return (y : ys)
         else return []
 
 untilM' :: (Monad m) => m a -> m Bool -> m [a]

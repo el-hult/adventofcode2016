@@ -1,0 +1,21 @@
+name: day16
+version: 0.1.0.0
+
+dependencies:
+- base >= 4.7 && < 5
+- util
+
+executables:
+  day16:
+    main:                Main.hs
+    source-dirs:         app
+    dependencies:
+    - day16
+
+tests:
+  day16-test:
+    main:                Spec.hs
+    source-dirs:         test
+    dependencies:
+    - day16
+    - HUnit
