@@ -1,14 +1,14 @@
 name: day10
 version: 0.1.0.0
 
-dependencies:
-- base >= 4.7 && < 5
-- util
 
 executables:
   day10:
     main:                Main.hs
     source-dirs:         app
     dependencies:
-    - day10
+    - base >= 4.7 && < 5
+    - util
+    - mtl
+    - containers
 

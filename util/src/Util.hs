@@ -124,6 +124,7 @@ takeUpTo p xs =
 ------------------------------------------------------------------------------------
 -- Inspired or stolen from https://hackage.haskell.org/package/monad-loops-0.4.3/docs/Control-Monad-Loops.html
 
+repeatM :: (Monad m) => Int -> m a -> m a
 repeatM n f
   | n <= 1 = f
   | otherwise = f >> repeatM (n -1) f -- do monadic action n times
