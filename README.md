@@ -27,9 +27,10 @@ There is also a package `util` exposing the module `Util`.
 
 ## Formatters
 
-Use `ormolu`. It is opinionated, and works with HLS for VS Code. Command line call it using
+Use `ormolu`. It is opinionated. Command line call it using below.
+There is a VSCode extension for it, but I did not get it to work with the multi-cradle and stack setup, so I just used the CLI directly.
 ```shell
-stack exec ormolu -- some/file/path.hs --mode inplace
+stack exec ormolu -- --mode inplace  some/file/path.hs 
 ```
 
 

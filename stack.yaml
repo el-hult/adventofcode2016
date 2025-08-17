@@ -10,6 +10,12 @@ ghc-options:
     # All packages get these options
     "$locals": -Wall -threaded -rtsopts -with-rtsopts=-N
 
+# without this line, I could not install ormolu ...
+extra-deps:
+- Cabal-syntax-3.14.2.0
+# .. but then I needed to pin Cabal to a compatible version otherwise things broke.
+- Cabal-3.14.2.0
+
 # User packages to be built. Each one is a folder with a Package inside it
 # Each package is defined by package.yaml, which hpack translates into a .cabal-file
 packages:

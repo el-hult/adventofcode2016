@@ -1,6 +1,7 @@
-{-# LANGUAGE Arrows, TupleSections #-}
+{-# LANGUAGE Arrows #-}
+{-# OPTIONS_GHC -Wno-x-partial #-}
 
--- |
+-- \|
 -- Module      :  Day14
 -- Maintainer  :  ludvig.hult@gmail.com
 --
@@ -29,12 +30,10 @@
 --
 -- Lastly, there is a GHC extension that introduces so-called Arrow syntax. It is a variant of do-notation for arrows. I have enabled it
 -- since the `Circuit` example uses it in `mean2`
-module Day14 where
 
 import Control.Arrow
 import qualified Control.Category as Cat
-import Data.List (group, tails)
-import Data.Maybe (isJust)
+import Data.List (group)
 import Data.Sequence (Seq (..))
 import qualified Data.Sequence as SQ
 import Util (hashString, safeHead)
@@ -48,7 +47,7 @@ import Util (hashString, safeHead)
 newtype Circuit a b = Circuit {unCircuit :: a -> (Circuit a b, b)}
 
 instance Cat.Category Circuit where
-  id = Circuit (Cat.id, )
+  id = Circuit (\x -> (Cat.id, x))
   (.) = dot
     where
       (Circuit cir2) `dot` (Circuit cir1) = Circuit $ \a ->
@@ -80,21 +79,6 @@ accum acc f = Circuit $ \input ->
   let (output, acc') = input `f` acc
    in (accum acc' f, output)
 
--- | Accumulator that outputs the accumulator value.
-accum' :: b -> (a -> b -> b) -> Circuit a b
-accum' acc f = accum acc (\a b -> let b' = a `f` b in (b', b'))
-
--- ** Circuit application examples
-
-total = accum' 0 (+)
-
-mean1 = (total &&& (const 1 ^>> total)) >>> arr (uncurry (/))
-
-mean2 = proc value -> do
-  t <- total -< value
-  n <- total -< 1
-  returnA -< t / n
-
 -- * My own Solution code
 
 slide :: Int -> Circuit a (Maybe (SQ.Seq a))
@@ -119,16 +103,19 @@ collapseSeq (h :<| t) = case fst h of
     where
       quints = concatMap snd t
 
+inputSalt :: String
 inputSalt = "ngcjuoqr" -- the input of the day
-
-testSalt = "abc"
 
 -- |
 -- The Meat of my solution. a *Pipeline*.
 -- It transforms integers into nested tuples that say what index they are from, what characters are relevant
 -- for identification of triplets etc and if they are a valid OTP.
+pipe ::
+  String ->
+  (String -> String) ->
+  Circuit Int (Int, (Maybe (Char, [Char]), Bool))
 pipe salt hash =
-  arr (\x -> x -999)
+  arr (\x -> x - 999)
     &&& ( arr (\x -> salt ++ show x)
             >>> arr hash
             >>> arr firstTriplet &&& arr allQuintuplets
@@ -137,6 +124,7 @@ pipe salt hash =
             >>> Cat.id &&& arr (maybe False (uncurry elem))
         )
 
+main :: IO ()
 main = do
   print . (!! 63) . filter (snd . snd) . runCircuit (pipe inputSalt hashString) $ [1 ..] -- check that the 64th element (index 63) in that list comes from original index 18626, which is true answer. it  goes REALLY FAST to compute.
   mapM_ print $ take 64 . filter (snd . snd) . runCircuit (pipe inputSalt (\s -> iterate hashString s !! 2017)) $ [1 ..] -- the answer is 20092, which is the last output. it takes ca 10 minutes to run though. That could well be 2017 times more than before.
