@@ -5,6 +5,9 @@ dependencies:
 - base >= 4.7 && < 5
 - util
 
+library:
+  source-dirs:         src
+
 executables:
   day16:
     main:                Main.hs

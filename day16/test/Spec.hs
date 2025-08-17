@@ -1,5 +1,7 @@
+import Test.HUnit
+import qualified Day16 as D16
 
-
+testDay16 :: Test
 testDay16 =
   TestList $
     map TestCase
@@ -8,3 +10,6 @@ testDay16 =
         (@=?) "01100" $ D16.toStr . D16.getChecksum . D16.toBV $ "10000011110010000111",
         (@=?) "01100" $ D16.solve 20 "10000"
       ]
+
+main :: IO ()
+main = runTestTT testDay16 >>= print
