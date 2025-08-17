@@ -1,4 +1,7 @@
+import Test.HUnit
+import qualified Day7 as D7
 
+testDay7 :: Test
 testDay7 =
   TestList
     [ TestLabel "Windowing" $ TestCase $ assertEqual "case1" ["ab", "bc", "cd", "de"] $ D7.windows 2 "abcde",
@@ -36,3 +39,6 @@ testDay7 =
             TestCase $ assertBool "case4" $ D7.supportsSSL . D7.parseIPv7 $ "zazbz[bzb]cdb"
           ]
     ]
+
+main :: IO ()
+main = runTestTT testDay7 >>= print

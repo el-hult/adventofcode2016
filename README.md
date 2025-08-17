@@ -1,3 +1,7 @@
+WORK IN PROGESS: days 1-7 and 17-21 are done. Day 8-16 must be verified (there are some bugs with the package.yaml files etc from changing the proj structure)
+Day 22 is started, but not finished.
+Day 23-25 are not started yet.
+
 For solving the AoC2016 advent calendar. http://adventofcode.com/2016
 
 Project structure inspired by (Tomash Aschan)[https://github.com/tomasaschan/advent-of-code-2018].
