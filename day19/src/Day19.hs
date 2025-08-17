@@ -5,12 +5,14 @@ import qualified Data.Sequence as SS
 
 -- | Compute the solution to part A
 -- After some contemplation, I realize the problem has an easy solution. :)
+solveA :: Int -> Int
 solveA k = 2 * (k - a) + 1
   where
-    d = fromInteger k :: Double
-    a' = toInteger (floor $ logBase 2 d)
+    d = fromIntegral k :: Float
+    a' = floor $ logBase 2 d :: Int
     a = 2 ^ a'
 
+solveB :: Int -> Int
 solveB k = flip SS.index 0 . fst . last $ unfoldr stealOne (SS.fromList [1 .. k], 0)
 
 type State = (SS.Seq Int, Int)
