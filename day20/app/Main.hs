@@ -3,9 +3,10 @@ import Day20
 
 -- | Get the first non-blocked address
 solveA :: Blacklist -> Address
-solveA (Blacklist rs) = if n1 == 0 then n2 + 1 else n1 -1
+solveA (Blacklist (range:_)) = if n1 == 0 then n2 + 1 else n1 -1
   where
-    (n1, n2) = head rs
+    (n1, n2) = range
+solveA _ = error "unreachable: solveA called with empty blacklist"
 
 -- | Compute the number of non-blocked IP adresses by counting the blocked adresses
 -- And then take all allowed adresses minus the blocked ones. A critical step here is that the

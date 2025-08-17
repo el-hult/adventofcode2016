@@ -46,7 +46,7 @@ mergeRanges (n1, n2) (n3, n4)
         || (m4 `inRange` rM1)
 
 -- | take a SORTED list of ranges, and normalize it to nonoverlapping ranges
--- Holds a temporary range that it merges on two. When there is a gap, it puts the
+-- Holds a temporary range that it merges onto. When there is a gap, it puts the
 -- old tmp-range on the accumulator, and picks a new temp-range
 mergeRangeList :: [Range] -> [Range]
 mergeRangeList [] = []
@@ -62,4 +62,4 @@ makeBlacklist :: String -> Blacklist
 makeBlacklist = Blacklist . mergeRangeList . sort . map (sortTuple . bimap read read . splitFirst '-') . lines
 
 totalBlocked :: Blacklist -> Word32
-totalBlocked (Blacklist rs) = sum . map (\(a, b) -> b - a + 1) $ rs
+totalBlocked (Blacklist ranges) = sum . map (\(a, b) -> b - a + 1) $ ranges
