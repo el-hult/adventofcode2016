@@ -1,4 +1,4 @@
-module Day8 where
+module Main where
 
 import Data.List (transpose)
 import Util (splitOn)
@@ -35,24 +35,32 @@ rotateR args (Screen b) =
    in Screen $ zipWith (\i bs -> if i == rowNo then rotate n bs else bs) [0 ..] b
 
 rotateC :: [String] -> Screen -> Screen
-rotateC args sc = transScreen $ rotateR args $transScreen sc
+rotateC args sc = transScreen $ rotateR args $ transScreen sc
 
 transScreen :: Screen -> Screen
 transScreen (Screen b) = Screen (transpose b)
 
 parseRotateArgs :: [String] -> (Int, Int)
-parseRotateArgs w = do
-  let n = read (tail $ tail ( head w)) :: Int
-  let m = read (w !! 2) :: Int
+parseRotateArgs (w1:_:w3:_) = do
+  let n = read (drop 2 w1) :: Int
+  let m = read w3 :: Int
   (n, m)
+parseRotateArgs _ = error "Invalid rotate args"
 
 parseRectArgs :: [String] -> (Int, Int)
-parseRectArgs w =
-  let z0 : z1 : _ = splitOn 'x' (head w)
-   in (read z1 :: Int, read z0 :: Int)
+parseRectArgs (w:_) =
+  case splitOn 'x' w of 
+    [] -> error "Invalid rect args"
+    (_:[]) -> error "Invalid rect args"
+    (z0:z1:_) -> (read z1 :: Int, read z0 :: Int)
+parseRectArgs _ = error "Invalid rect args"
 
 replaceAtIndex :: Int -> a -> [a] -> [a]
-replaceAtIndex n item ls = a ++ (item : b) where (a, _ : b) = splitAt n ls
+replaceAtIndex n item ls = 
+  let (a,bs) = splitAt n ls
+  in case bs of
+    [] -> error "Index out of bounds"
+    (_:b) -> a ++ (item : b)
 
 -- rotates to the right in a normal list.
 rotate :: Int -> [a] -> [a]
@@ -64,6 +72,7 @@ taskA s = do
   let done = foldl instruct blank $ lines s
   show done ++ show (countPixels done) ++ " pixels are on"
 
+main :: IO ()
 main =
   readFile "inputs/day08.txt" >>= \inString ->
     putStrLn "Answer to A:"
