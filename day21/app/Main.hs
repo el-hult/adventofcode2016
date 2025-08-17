@@ -1,12 +1,17 @@
 module Main where
-
+import Prelude hiding (last)
 import Day21
 
-solveA :: [Instruction] -> [String]
-solveA = scanl applyInstruction "abcdefgh"
+last :: [a] -> a
+last [] = error "empty list - no last element"
+last (x:[]) = x
+last (_:xs) = last xs
 
-solveB :: [Instruction] -> [String]
-solveB = scanl applyInstruction "fbgdceah" . reverse . map invertInstruction
+solveA :: [Instruction] -> String
+solveA = last . scanl applyInstruction "abcdefgh"
+
+solveB :: [Instruction] -> String
+solveB = last . scanl applyInstruction "fbgdceah" . reverse . map invertInstruction
 
 main :: IO ()
 main = do

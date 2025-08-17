@@ -1,24 +1,23 @@
 module Day21 where
 
 import Text.Parsec
-import Text.Parsec.Char
 import Util
 
 data Instruction = SwapPosition Int Int | SwapLetter Char Char | RotateLeft Int | RotateRight Int | RotateByLetter Char | InverseRotateByLetter Char | ReverseBewtween Int Int | MovePosition Int Int deriving (Show, Read)
 
 p1 :: Parsec String () Instruction
 p1 = do
-  try $ string "swap position "
+  _ <- try $ string "swap position "
   x <- many1 digit
-  string " with position "
+  _ <- string " with position "
   y <- many1 digit
   pure $ SwapPosition (read x) (read y)
 
 p2 :: Parsec String () Instruction
 p2 = do
-  try $ string "swap letter "
+  _ <- try $ string "swap letter "
   x <- letter
-  string " with letter "
+  _ <- string " with letter "
   SwapLetter x <$> letter
 
 p3 :: Parsec String () Instruction
@@ -32,17 +31,17 @@ p5 = try (string "rotate based on position of letter ") *> (RotateByLetter <$> l
 
 p6 :: Parsec String () Instruction
 p6 = do
-  try $ string "reverse positions "
+  _ <- try $ string "reverse positions "
   x <- many1 digit
-  string " through "
+  _ <- string " through "
   y <- many1 digit
   pure $ ReverseBewtween (read x) (read y)
 
 p7 :: Parsec String () Instruction
 p7 = do
-  try $ string "move position "
+  _ <- try $ string "move position "
   x <- many1 digit
-  string " to position "
+  _ <- string " to position "
   y <- many1 digit
   pure $ MovePosition (read x) (read y)
 
@@ -78,7 +77,7 @@ applyInstruction s (RotateByLetter a) =
    in rotR y s
 applyInstruction s (InverseRotateByLetter a) =
   let x = unsafeIndexOf a s
-      y = if odd x then (x + 1) `div` 2 else case x of 2 -> 6; 4 -> 7; 6 -> 0; 0 -> 1
+      y = if odd x then (x + 1) `div` 2 else case x of 2 -> 6; 4 -> 7; 6 -> 0; 0 -> 1; _ -> error "unreachable"
    in rotL y s
 applyInstruction s (ReverseBewtween x y) =
   let a = take x s
@@ -91,11 +90,12 @@ applyInstruction s (MovePosition x y) =
   let (s', a) = unsafePop x s
    in insertAt y s' a
 
+invertInstruction :: Instruction -> Instruction
 invertInstruction (SwapPosition a b) = SwapPosition a b
 invertInstruction (SwapLetter a b) = SwapLetter a b
 invertInstruction (RotateLeft x) = RotateRight x
 invertInstruction (RotateRight x) = RotateLeft x
 invertInstruction (RotateByLetter a) = InverseRotateByLetter a
-invertInstruction (InverseRotateByLetter a) = undefined
+invertInstruction (InverseRotateByLetter _) = undefined
 invertInstruction (ReverseBewtween x y) = ReverseBewtween x y
 invertInstruction (MovePosition x y) = MovePosition y x
