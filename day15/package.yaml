@@ -9,5 +9,3 @@ executables:
   day15:
     main:                Main.hs
     source-dirs:         app
-    dependencies:
-    - day15

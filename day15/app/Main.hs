@@ -1,4 +1,5 @@
-module Day15 where
+{-# OPTIONS_GHC -Wno-x-partial #-}
+
 
 import Data.List (sortOn)
 
@@ -46,10 +47,13 @@ crtSieve xs = filter isSolution [1 ..]
   where
     isSolution t = and [t `mod` si == ai | (si, ai) <- xs]
 
-solveA input = head . crtSieve $ modsAndRems input
+solveA :: [(DiscSize, Offset)] -> Int
+solveA = head . crtSieve . modsAndRems
 
+solveB :: [(DiscSize, Offset)] -> Int
 solveB input = head . crtSieve $ modsAndRems (input ++ [(11, 0)]) -- somewhat idiotic, I dont reuse results from A in B. but this is BLAZINGLY fast anyways.
 
+main :: IO ()
 main = do
   print . solveA $ myInput -- 376777 is correct
-  print . solveB $ myInput -- ? is correct
+  print . solveB $ myInput -- 3903937 is correct
