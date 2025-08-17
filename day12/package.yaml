@@ -4,6 +4,12 @@ version: 0.1.0.0
 dependencies:
 - base >= 4.7 && < 5
 - util
+- parsec
+- mtl
+- containers
+
+library:
+  source-dirs: src
 
 executables:
   day12:
