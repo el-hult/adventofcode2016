@@ -1,8 +1,8 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# OPTIONS_GHC -Wno-x-partial #-}
 
 module Day17 where
 
-import Debug.Trace (trace)
 import Util (hashString)
 
 -- |
@@ -43,7 +43,9 @@ data State = State
   }
   deriving (Show, Eq)
 
-{-Compute the open doors and pack into a state -}
+-- | Compute the open doors and pack into a state
+-- Calling 'hashString' on 'key' all the time is wasteful, since only a single character is added to the `key' at each
+-- step. If the hasher was stateful we could pass it around and speed up things. That is a optimization for another day...
 makeState :: Pos -> String -> Int -> Int -> State
 makeState (x, y) key pcLen = State (x, y) key (filter onMap . map fst . filter (flip elem "bcdef" . snd) . zip [U, D, L, R] $ hash') pcLen hash'
   where
@@ -54,8 +56,8 @@ makeState (x, y) key pcLen = State (x, y) key (filter onMap . map fst . filter (
     onMap R = x < 4
 
 -- | A wrapper for `makeState`, in the case when we create initial states.
-makeState2 :: String -> State
-makeState2 key = makeState (1, 1) key (length key) 0
+initializeState :: String -> State
+initializeState key = makeState (1, 1) key (length key) 0
 
 step :: Dir -> State -> State
 step dir State {..} = makeState (stepCoord pos dir) (track ++ show dir) pcLen (pathLen + 1)
@@ -79,26 +81,12 @@ bfs s = go [s]
     go [] = []
     go xs = xs ++ go (xs >>= getNeighbors) -- slow appends! but it might be good enough I guess.
 
--- | depth first search
--- This implementation is in IO so I can print-debug
--- I also have a recursion limit set to 50_000
--- This DFS makes the WinState absorbing
--- to make sure that the recursion limit i high enough, I have
--- a print statement that I exhausted the stack
-dfs' :: State -> [State]
-dfs' s = go [s] [] 50000
-  where
-    go :: [State] -> [State] -> Int -> [State]
-    go _ r 0 = trace "ran all lotted times" r
-    go [] r _ = trace "exhausted the stack" r
-    go (x : xs) toReturn n =
-      let showSometimes = if n `mod` 100 == 0 then trace ("Curr stack size:" ++ show (length xs + 1)) else id
-       in if isWinState x
-            then showSometimes $ go xs (toReturn ++ [x]) (n -1)
-            else showSometimes $ go (getNeighbors x ++ xs) (toReturn ++ [x]) (n -1)
-
--- | A Non-IO version of `dfs` above, with no recursion limit.
--- I moved to this after seeing that the algo above worked.
+-- | dfs s
+-- depth first search in a tree structure
+-- since it is a tree, we dont need to keep track of revealed nodes (otherwise used to avoid revisiting expanded nodes)
+-- there is no termination condition, so ALL nodes will be visited.
+-- the nice thing here is that due to haskell lazyness, we can consume the list
+-- it returns, and it won't need to allocate space for all possible expansions.
 dfs :: State -> [State]
 dfs s = go [s] []
   where
@@ -114,7 +102,4 @@ solveA :: State -> [Char]
 solveA = getPath . head . filter isWinState . bfs
 
 solveB :: State -> Int
-solveB = maximum . map pathLen . filter isWinState . dfs -- non-io version
-
-solveB' :: State -> Int
-solveB' = maximum . map pathLen . filter isWinState . dfs -- tracing version
+solveB = maximum . map pathLen . filter isWinState . dfs

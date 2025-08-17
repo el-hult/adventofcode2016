@@ -2,16 +2,16 @@ import Day17
 import Test.HUnit hiding (State)
 
 initialStateTest0 :: State
-initialStateTest0 = makeState2 "hijkl"
+initialStateTest0 = initializeState "hijkl"
 
 initialStateTest1 :: State
-initialStateTest1 = makeState2 "ihgpwlah"
+initialStateTest1 = initializeState "ihgpwlah"
 
 initialStateTest2 :: State
-initialStateTest2 = makeState2 "kglvqrro"
+initialStateTest2 = initializeState "kglvqrro"
 
 initialStateTest3 :: State
-initialStateTest3 = makeState2 "ulqzkmiv"
+initialStateTest3 = initializeState "ulqzkmiv"
 
 
 testDay17 :: Test

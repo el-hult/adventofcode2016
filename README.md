@@ -1,6 +1,6 @@
 WORK IN PROGESS: 
-- Day 01-12 done
-- Day 17-21 needs refactoring / verification.
+- Day 01-17 done
+- Day 18-21 needs refactoring / verification.
 - Day 22 is started, but not finished.
 - Day 23-25 are not started yet.
 
