@@ -3,7 +3,7 @@ module Main where
 
 import Data.Char (digitToInt)
 import Data.Maybe (catMaybes)
-import Util (hashString)
+import Util (hashString, replaceAtIndex)
 
 getMaybeKey :: String -> Maybe Char
 getMaybeKey ('0' : '0' : '0' : '0' : '0' : x : _) = Just x
@@ -22,19 +22,12 @@ evalMoves :: String -> [(Int, Char)] -> String
 evalMoves codeState [] = codeState
 evalMoves codeState [(i, c)]
   | '-' `notElem` codeState = codeState -- we are done!
-  | codeState !! i == '-' = replaceNth i c codeState -- set the new value and finish
+  | codeState !! i == '-' = replaceAtIndex i c codeState -- set the new value and finish
   | otherwise = codeState -- it stopped here....
 evalMoves codeState ((i, c) : moreMoves)
   | '-' `notElem` codeState = codeState -- we are done!
-  | codeState !! i == '-' = evalMoves (replaceNth i c codeState) moreMoves -- set the new value and try next move
+  | codeState !! i == '-' = evalMoves (replaceAtIndex i c codeState) moreMoves -- set the new value and try next move
   | otherwise = evalMoves codeState moreMoves -- try next move
-
--- http://stackoverflow.com/questions/5852722/replace-individual-list-elements-in-haskell
-replaceNth :: Int -> t -> [t] -> [t]
-replaceNth n newVal (x : xs)
-  | n == 0 = newVal : xs
-  | otherwise = x : replaceNth (n -1) newVal xs
-replaceNth _ _ [] = []
 
 task5b :: String -> String
 task5b input = do

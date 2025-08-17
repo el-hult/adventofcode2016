@@ -35,8 +35,17 @@ splitLast c s = do
     then [concat (take j z), z !! j]
     else [s]
 
+replaceAtIndex :: Int -> a -> [a] -> [a]
+replaceAtIndex n item ls = 
+  let (a,bs) = splitAt n ls
+  in case bs of
+    [] -> error "Index out of bounds"
+    (_:b) -> a ++ (item : b)
+
+removePunc :: String -> String
 removePunc xs = [x | x <- xs, x `notElem` ",.?!-:;\"\'[]"]
 
+safeHead :: [a] -> Maybe a
 safeHead [] = Nothing
 safeHead (x : _) = Just x
 
@@ -56,18 +65,18 @@ splitFirst :: Eq a => a -> [a] -> ([a], [a])
 splitFirst y xs = runState (go y xs) []
   where
     go y [] = pure [] :: State [a] [a]
-    go y (x : xs)
-      | y == x = pure xs
-      | otherwise = modify (\s -> s ++ [x]) >> go y xs
+    go y (z : zs)
+      | y == z = pure zs
+      | otherwise = modify (\s -> s ++ [z]) >> go y zs
 
 -- | Find first occurence of an element in a list. You must guarantee that the element is there!
 unsafeIndexOf :: (Eq a, Integral b) => a -> [a] -> b
 unsafeIndexOf a xs = go a xs 0
   where
     go a [] i = error "Element not present"
-    go a (x : xs) i
-      | x == a = i
-      | otherwise = go a xs (i + 1)
+    go a (y : ys) i
+      | y == a = i
+      | otherwise = go a ys (i + 1)
 
 -- | Rotate the list to the left. Has BAD complexity!
 rotL :: Int -> [a] -> [a]
@@ -84,12 +93,17 @@ rotR x s =
    in rotL y s
 
 -- | removes an element at a index in a list.
+unsafePop :: Int -> [a] -> ([a], a)
 unsafePop i xs =
   let a = take i xs
       b = drop i xs
       x = head b
    in (a ++ tail b, x)
 
+-- | insertAt i xs x
+-- Inserts `x` into `xs` at index `i`
+-- PRE: 0 <= i <= length xs
+insertAt :: Int -> [a] -> a -> [a]
 insertAt i xs x =
   let a = take i xs
       b = drop i xs

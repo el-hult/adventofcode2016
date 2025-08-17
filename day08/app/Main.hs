@@ -55,12 +55,6 @@ parseRectArgs (w:_) =
     (z0:z1:_) -> (read z1 :: Int, read z0 :: Int)
 parseRectArgs _ = error "Invalid rect args"
 
-replaceAtIndex :: Int -> a -> [a] -> [a]
-replaceAtIndex n item ls = 
-  let (a,bs) = splitAt n ls
-  in case bs of
-    [] -> error "Index out of bounds"
-    (_:b) -> a ++ (item : b)
 
 -- rotates to the right in a normal list.
 rotate :: Int -> [a] -> [a]
