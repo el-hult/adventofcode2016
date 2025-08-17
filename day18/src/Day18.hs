@@ -1,7 +1,6 @@
 module Day18 where
 
 import Control.Monad (join)
-import Data.List (foldl1', unfoldr)
 import Util (windows)
 
 -- |
@@ -32,24 +31,28 @@ instance Read Tile where
       go "" acc = Just acc
       go ('^' : s) acc = go s (Trap : acc)
       go ('.' : s) acc = go s (Safe : acc)
-      go _ acc = Nothing
+      go _ _ = Nothing
 
 instance Show Row where
   show (Row []) = ""
   show (Row (x : xs)) = show x ++ show (Row xs)
 
+-- | Given three tiles, decide the tile on next row
+rule :: [Tile] -> Tile
 rule [Safe, _, Trap] = Trap
 rule [Trap, _, Safe] = Trap
 rule _ = Safe
 
+-- | Given a row, produce the next row
+nextR :: Row -> Row
 nextR (Row bs) = Row . map rule . windows 3 $ padded
   where
     padded = Safe : bs ++ [Safe]
 
+
+-- | The initial row for my specific puzzle input
+initRow :: Row
 initRow = Row . read $ "^.^^^..^^...^.^..^^^^^.....^...^^^..^^^^.^^.^^^^^^^^.^^.^^^^...^^...^^^^.^.^..^^..^..^.^^.^.^......."
 
-initRowTest1 = Row . read $ "..^^."
-
-initRowTest2 = Row . read $ ".^^.^.^^^^"
 
 solveA n = length . filter (== Safe) . join . map unRow . take n . iterate nextR

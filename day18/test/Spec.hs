@@ -1,6 +1,11 @@
 import Day18
 import Test.Hspec
 
+initRowTest1 :: Row
+initRowTest1 = Row . read $ "..^^."
+initRowTest2 :: Row
+initRowTest2 = Row . read $ ".^^.^.^^^^"
+
 main :: IO ()
 main = hspec $ do
   describe "foo" $ do
