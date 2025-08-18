@@ -1,7 +1,6 @@
 WORK IN PROGESS: 
-- Day 01-21 done
-- Day 22 is started, but not finished.
-- Day 23-25 are not started yet.
+- Day 01-22 done
+- Day 23-25 to be done
 
 For solving the AoC2016 advent calendar. http://adventofcode.com/2016
 

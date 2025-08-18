@@ -3,24 +3,10 @@ version: 0.1.0.0
 
 dependencies:
 - base >= 4.7 && < 5
-- util
-- lens
-- containers
+- regex-tdfa
 
-library:
-  source-dirs: src
 
 executables:
   day22:
     main:                Main.hs
     source-dirs:         app
-    dependencies:
-    - day22
-
-tests:
-  day22-test:
-    main:                Spec.hs
-    source-dirs:         test
-    dependencies:
-    - day22
-    - hspec
