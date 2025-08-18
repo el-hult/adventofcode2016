@@ -24,11 +24,3 @@ tests:
     dependencies:
     - day22
     - hspec
-
-benchmarks:
-  day22-bench:
-    main:                Bench.hs
-    source-dirs:         bench
-    dependencies:
-    - day22
-    - criterion

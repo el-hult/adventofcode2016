@@ -5,14 +5,38 @@
 
 -- | Solutions to Day 22
 --
--- # Part A
+-- # Part One
 -- Here, we are asked to read a list of data nodes, and check pairwise if they are a "viable" pair. I.e. if
 --     1) A != B
 --     2) used A <= (size B - used B)
 --     3) 0 < used A
 --
--- it is unclear if they are considered an ordered pair or not. I.e. if this is fulfilled both for (A,B) and (B,A), does that count as two occurances?
+-- it is an ordered pair, so (A,B) and (B,A) can be different viable pairs.
+--
+-- # Part Two
+-- We are to solve a kind of 15 sliding puzzle. We are to move data between nodes. We can only move to adjacent nodes. If moving, it leaves the source node empty.
+-- I hated this problem. A lot.
+-- My first try was many many years ago. I tried solving it with a BFS search, but it was too slow.
+-- Then I tried A*, but that was also too slow.
+-- I gave up for a couple of years.
+-- Tried to solve it in Python instead. (with BFS and A*).
+-- Failed that too.
+-- Finally I plotted my data.
+-- I then realized that the simplifications made in the instructions apply to my data as well -- you don't need to care about the amount of data each node has!
+-- You only need to track: 
+-- 1) where the 'goal' data is
+-- 2) where the 'hole' is (the empty node)
+-- And you must know (but this is not variable) where are the 'wall' nodes, i.e. nodes that can never be moved to/from, so the hole can never go there.
+-- with this simplification, I solved my paper with pen and paper.
+-- I then implemented an A* solver in python. It was super fast. Essentially just copy pasting the pseudo code from wikipedia.
+--
+-- Trying to make A* work, while tracking all the utilization levels for each node, I could not get to work. The problem is that the searach space simply explodes too fast.
+-- I need some super clever pruning/heuristic to make that work, and that is definitely outside the scope of Advent of Code.
+-- The simplification I needed to make was explicitly hinted in the instructions, so that seems like a fair simplification to make. 
+-- I have implemented the relevant checks in my code to verify that the simplification is valid for my input data, in case you run it with some other input.
 module Day22 where
+
+-- TODO: implement the python algorithm in Haskell code below
 
 import Control.Lens
 import Control.Monad (MonadPlus (mzero), guard)
