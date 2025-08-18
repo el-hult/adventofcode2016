@@ -1,0 +1,12 @@
+name: day23
+version: 0.1.0.0
+
+dependencies:
+- base >= 4.7 && < 5
+- regex-tdfa
+
+
+executables:
+  day23:
+    main:                Main.hs
+    source-dirs:         app
