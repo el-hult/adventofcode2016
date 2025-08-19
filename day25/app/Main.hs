@@ -5,7 +5,6 @@ Day 25
 We are to implement assembunny again.
 This time, the question is to do some analysis of the program.
 
-Part A:
 What is the lowest positive integer to initizle register 'a' with, so that the program outputs 0,1,0,1, forever?
 The program has no `tgl` instruction, so static analysis is fine.
 It has a single `out` instruction, which is `out b` so we need to know when we would have 0 and 1 alternatingly in register 'b' when arriving at that instruction.
