@@ -1,6 +1,6 @@
 WORK IN PROGESS: 
-- Day 01-22 done
-- Day 23-25 to be done
+- Day 01-24 done
+- Day    25 to be done
 
 For solving the AoC2016 advent calendar. http://adventofcode.com/2016
 
