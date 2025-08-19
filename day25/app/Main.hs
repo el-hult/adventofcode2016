@@ -42,6 +42,9 @@ So I implemented that, and it did not work. Why? Because of an off-by-one error.
 
 With that, all was finally good!
 
+I also implemented a little sieve, so that I could exclude seeds faster. 
+I don't need to wait for them to loop, if I already know their output is wrong.
+
 -}
 import Control.Monad.State (StateT, get, put, lift, evalStateT)
 import Control.Monad (guard)
@@ -124,7 +127,7 @@ modifyR r f i = setR r v i where v = f (getR r i)
 regs :: Interpreter -> Registers
 regs int = (a int, b int, c int, d int)
 
-data ExitCode = BadLoop | GoodLoop | Terminated | Running deriving (Show, Eq)
+data ExitCode = WrongOutput | BadLoop | GoodLoop | Terminated | Running deriving (Show, Eq)
 
 -- | loopDetection history
 -- check if there are any loops in the history of registers
@@ -152,19 +155,26 @@ loopDetection hist@(r:rs) | r `elem` rs =
 loopDetection _ = error "unreachable"
       
           
-      
+-- | detectBadOutput history
+-- checks if the latest output value is incorrect
+detectBadOutput :: [Registers] -> Bool
+detectBadOutput [] = False
+detectBadOutput hist@((_,x,_,_):_) = x == (if odd (length hist) then 1 else 0)
+
 
 run :: StateT (Interpreter, [Registers]) IO ExitCode
 run = do
   (int, history) <- get
-  case loopDetection history of
-    Just GoodLoop -> return GoodLoop
-    Just BadLoop -> return BadLoop
-    Just _ -> error "Unexpected loop detection result"
-    Nothing -> do
-      if (p int > (length . prog $ int))
-                then (lift $ print "Terminated") >> return Terminated
-                else (step >> run)
+  if detectBadOutput history
+    then return WrongOutput
+    else case loopDetection history of
+      Just GoodLoop -> return GoodLoop
+      Just BadLoop -> return BadLoop
+      Just _ -> error "Unexpected loop detection result"
+      Nothing -> do
+        if (p int > (length . prog $ int))
+                  then (lift $ print "Terminated") >> return Terminated
+                  else (step >> run)
 
 
 -- | step 
