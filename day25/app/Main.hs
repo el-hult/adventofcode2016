@@ -43,7 +43,8 @@ So I implemented that, and it did not work. Why? Because of an off-by-one error.
 With that, all was finally good!
 
 -}
-import Control.Monad.State
+import Control.Monad.State (StateT, get, put, lift, evalStateT)
+import Control.Monad (guard)
 import Data.List ((!?))
 
 
@@ -196,25 +197,29 @@ step = do
 --
 -- returns Nothing if no optimization was possible
 quickStep :: Interpreter -> Maybe Interpreter
-quickStep s@(Interpreter{p=pc,prog=prog'}) = case prog' !? pc of
-  Just (Cpy x (R r3)) -> case prog' !? (pc + 1) of
-    Just (Inc (R r1)) -> case prog' !? (pc + 2) of
-      Just (Dec (R r3')) | r3' == r3 -> case prog' !? (pc + 3) of
-        Just (Jnz (R r3'') (I y)) | r3'' == r3 && y == -2 -> case prog' !? (pc + 4) of
-          Just (Dec (R r4)) -> case prog' !? (pc + 5) of
-            Just (Jnz (R r4') (I y')) | r4' == r4 && y' == -5 ->
-              let r1Val = getR r1 s
-                  xVal = case x of
-                    R r2 -> getR r2 s
-                    I n -> n
-                  r4Val = getR r4 s
-              in Just $ modifyR 'p' (\p' -> p'+6).  setR r1 (r1Val + xVal * r4Val) . setR r3 0 . setR r4 0 $ s
-            _ -> Nothing
-          _ -> Nothing
-        _ -> Nothing
-      _ -> Nothing
-    _ -> Nothing
-  _ -> Nothing
+quickStep s@(Interpreter{p=pc,prog=prog'}) = do
+  Cpy x (R r3)         <- prog' !? pc
+  Inc (R r1)           <- prog' !? (pc + 1)
+  Dec (R r3')          <- prog' !? (pc + 2)
+  guard (r3' == r3)
+  Jnz (R r3'') (I y)   <- prog' !? (pc + 3)
+  guard (r3'' == r3 && y == -2)
+  Dec (R r4)           <- prog' !? (pc + 4)
+  Jnz (R r4') (I y')   <- prog' !? (pc + 5)
+  guard (r4' == r4 && y' == -5)
+
+  let r1Val = getR r1 s
+      xVal  = case x of
+        R r2 -> getR r2 s
+        I n  -> n
+      r4Val = getR r4 s
+
+  pure $ modifyR 'p' (+6)
+       . setR r1 (r1Val + xVal * r4Val)
+       . setR r3 0
+       . setR r4 0
+       $ s
+
 
 -- | slowStep state
 -- run a single instruction of the interpreter
