@@ -33,20 +33,29 @@ We utilize the fact that the program is
 Therefore, the state when outputting is just determined by the registers and nothing more
 This solution was too slow, it seemes. or buggy. But here it is.
 
+At this point, I grew bored and checked around online.
+From the top post on reddit, it seems my approach should NOT work because the loops will not be simple.
+Even when the program outputs 01010101... correctly, it will cycle through a couple of different states outputting this.
+My loop detection must thus be more sophisticated.
+
+So I implemented that, and it did not work. Why? Because of an off-by-one error. BLARGH. Haskell is 0-indexed, not 1-indexed.
+
+With that, all was finally good!
+
 -}
 import Control.Monad.State
-import Control.Monad (when, guard, forM, mapM, forM_)
-import Util (replaceAtIndex)
 import Data.List ((!?))
-import Debug.Trace (trace)
 
 
 type Registers = (Int, Int, Int, Int)
 type Program = [Instruction]
 
 data Interpreter = Interpreter
-  { pc :: Int -- program counter
-  , regs :: Registers
+  { p :: Int -- program counter
+  , a :: Int -- register a
+  , b :: Int -- register b
+  , c :: Int -- register c
+  , d :: Int -- register d
   , prog :: Program
   } deriving (Show)
 
@@ -59,8 +68,8 @@ data Val =
   | R Char deriving (Show, Eq)
 
 toVal :: String -> Val
-toVal s@(c:_) 
-  | c `elem` ['a', 'b', 'c', 'd'] = R c
+toVal s@(q:_) 
+  | q `elem` ['a', 'b', 'c', 'd'] = R q
   | otherwise = I (read s)
 toVal _ = error "unreachable"
 
@@ -83,51 +92,78 @@ toInst ["out", x] = Out (toVal x)
 toInst _ = error "unreachable"
 
 -- | get the value of a register
-getR :: Registers -> Char -> Int
-getR (a, _, _, _) 'a' = a
-getR (_, b, _, _) 'b' = b
-getR (_, _, c, _) 'c' = c
-getR (_, _, _, d) 'd' = d
+getR :: Char -> Interpreter -> Int
+getR 'a' i = a i
+getR 'b' i = b i
+getR 'c' i = c i
+getR 'd' i = d i
+getR 'p' i = p i
 getR _ _ = error "unreachable"
 
 -- | set regs r 
-setR ::  Char -> Int -> Registers -> Registers
-setR 'a' x (_, b, c, d) = (x, b, c, d)
-setR 'b' x (a, _, c, d) = (a, x, c, d)
-setR 'c' x (a, b, _, d) = (a, b, x, d)
-setR 'd' x (a, b, c, _) = (a, b, c, x)
+setR ::  Char -> Int -> Interpreter -> Interpreter
+setR 'a' x i = i { a = x }
+setR 'b' x i = i { b = x }
+setR 'c' x i = i { c = x }
+setR 'd' x i = i { d = x }
+setR 'p' x i = i { p = x }
 setR _ _ _ = error "unreachable"
 
+-- | stepP
+-- advance the program counter by one
+stepP :: Interpreter -> Interpreter
+stepP i = modifyR 'p' (+1) i
+
 -- | modify regs r f
-modifyR :: Char -> (Int -> Int) -> Registers -> Registers
-modifyR r f regs = setR r (f (getR regs r)) regs
+modifyR :: Char -> (Int -> Int) -> Interpreter -> Interpreter
+modifyR r f i = setR r v i where v = f (getR r i)
+
+-- | regs
+-- get all registers as a tuple
+regs :: Interpreter -> Registers
+regs int = (a int, b int, c int, d int)
 
 data ExitCode = BadLoop | GoodLoop | Terminated | Running deriving (Show, Eq)
+
+-- | loopDetection history
+-- check if there are any loops in the history of registers
+-- we want to find if there is a cycle in the history
+-- the newest state is at the head of the list
+-- if this state has occurred before, we have a loop
+-- lets say the sequence is
+-- r q w e t r a s d f g h j 
+-- from our analysis of the code, we know that this program must revisit 
+-- the Out instruction in this cycle going forwards from now
+-- repeating the cycle from r to r.
+-- N.B. the history is appended on the left, so the newest state is at the head of the list
+-- i.e. we may have transient states before the loop
+-- so finding this loop, we must simply check that the sequence going from RIGHT TO LEFT
+-- has values 0 1 0 1 0 1 ... in the `b` register
+loopDetection :: [Registers] -> Maybe ExitCode
+loopDetection hist | length hist < 3 = Nothing
+loopDetection (r:rs) | r `notElem` rs = Nothing -- no loop, we have not seen this state before
+loopDetection hist@(r:rs) | r `elem` rs =
+  let 
+      expectedOutput = cycle [0, 1]
+      realOutput = map (\(_,x,_,_) -> x) . reverse $ hist
+      loopOutputIsGood = all (uncurry (==)) $ zip realOutput expectedOutput
+  in  if loopOutputIsGood then Just GoodLoop else Just BadLoop
+loopDetection _ = error "unreachable"
+      
+          
+      
 
 run :: StateT (Interpreter, [Registers]) IO ExitCode
 run = do
   (int, history) <- get
-  let pc_ = pc int
-  -- lift $ putStrLn $ "Registers: " ++ show (regs int)
-  -- lift $ putStrLn $ "Running instruction at pc=" ++ show pc_ ++ ": " ++ show (prog int !? pc_)
-  -- _ <- lift $ getLine
-  let foundGoodLoop = case history of
-            ((r1):(r2):(r3):_) -> (r1 == r3 && (getR r2 'b' == 1 - getR r1 'b'))
-            _ -> False
-
-  if foundGoodLoop
-    then return GoodLoop -- we found a good loop, so we stop running
-    else do
-      -- general loop detection
-      let foundBadLoop = case history of
-                (r:_) -> (r `elem` (drop 1 history))
-                _ -> False
-      if foundBadLoop
-        then return BadLoop
-        else do
-          if (pc_ > (length . prog $ int))
-            then (lift $ print "Terminated") >> return Terminated
-            else (step >> run)
+  case loopDetection history of
+    Just GoodLoop -> return GoodLoop
+    Just BadLoop -> return BadLoop
+    Just _ -> error "Unexpected loop detection result"
+    Nothing -> do
+      if (p int > (length . prog $ int))
+                then (lift $ print "Terminated") >> return Terminated
+                else (step >> run)
 
 
 -- | step 
@@ -160,20 +196,19 @@ step = do
 --
 -- returns Nothing if no optimization was possible
 quickStep :: Interpreter -> Maybe Interpreter
-quickStep s@(Interpreter pc regs prog) = case prog !? pc of
-  Just (Cpy x (R r3)) -> case prog !? (pc + 1) of
-    Just (Inc (R r1)) -> case prog !? (pc + 2) of
-      Just (Dec (R r3')) | r3' == r3 -> case prog !? (pc + 3) of
-        Just (Jnz (R r3'') (I y)) | r3'' == r3 && y == -2 -> case prog !? (pc + 4) of
-          Just (Dec (R r4)) -> case prog !? (pc + 5) of
+quickStep s@(Interpreter{p=pc,prog=prog'}) = case prog' !? pc of
+  Just (Cpy x (R r3)) -> case prog' !? (pc + 1) of
+    Just (Inc (R r1)) -> case prog' !? (pc + 2) of
+      Just (Dec (R r3')) | r3' == r3 -> case prog' !? (pc + 3) of
+        Just (Jnz (R r3'') (I y)) | r3'' == r3 && y == -2 -> case prog' !? (pc + 4) of
+          Just (Dec (R r4)) -> case prog' !? (pc + 5) of
             Just (Jnz (R r4') (I y')) | r4' == r4 && y' == -5 ->
-              let r1Val = getR regs r1
+              let r1Val = getR r1 s
                   xVal = case x of
-                    R r2 -> getR regs r2
+                    R r2 -> getR r2 s
                     I n -> n
-                  r4Val = getR regs r4
-                  regs' = setR r1 (r1Val + xVal * r4Val) . setR r3 0 . setR r4 0 $ regs
-              in Just (Interpreter (pc+6) regs' prog)
+                  r4Val = getR r4 s
+              in Just $ modifyR 'p' (\p' -> p'+6).  setR r1 (r1Val + xVal * r4Val) . setR r3 0 . setR r4 0 $ s
             _ -> Nothing
           _ -> Nothing
         _ -> Nothing
@@ -185,8 +220,8 @@ quickStep s@(Interpreter pc regs prog) = case prog !? pc of
 -- run a single instruction of the interpreter
 -- returns the new state of the interpreter, and a bool, indicating whether the instruction was an `out` instruction
 slowStep :: Interpreter -> (Interpreter, Bool)
-slowStep int@(Interpreter pc regs prog) =
-  case prog !? pc of
+slowStep int =
+  case (prog int) !? (p int) of
     Just inst -> step' inst int
     Nothing -> error "Program counter out of bounds"
 
@@ -194,31 +229,30 @@ slowStep int@(Interpreter pc regs prog) =
 -- Run the instruction `inst` at the current state of the registers `regs`, program `prog` and instruction pointer `pc`.
 -- Returns the new state of the registers, program and instruction pointer.
 step' :: Instruction -> Interpreter -> (Interpreter, Bool)
-step' (Cpy (I x) (R y)) (Interpreter pc regs prog) = (Interpreter (pc + 1) (setR y x regs) prog, False)
-step' (Cpy (R x) (R y)) (Interpreter pc regs prog) = (Interpreter (pc + 1) (setR y (getR regs x) regs) prog, False)
-step' (Inc (R x)) (Interpreter pc regs prog) = (Interpreter (pc + 1) (modifyR x (\v -> v+1) regs) prog, False)
-step' (Dec (R x)) (Interpreter pc regs prog) = (Interpreter (pc + 1) (modifyR x (\v -> v-1) regs) prog, False)
-step' (Jnz (R x) (I y)) (Interpreter pc regs prog) = (Interpreter (pc + if getR regs x /= 0 then y else 1) regs prog, False)
-step' (Jnz (I x) (I y)) (Interpreter pc regs prog) = (Interpreter (pc + if x /= 0 then y else 1) regs prog, False)
-step' (Jnz (I x) (R y)) (Interpreter pc regs prog) = (Interpreter (pc + if x /= 0 then getR regs y else 1) regs prog, False)
-step' (Out (R r)) i@(Interpreter pc regs _) = 
-  --(trace ("Output: " ++ show (getR regs r)) $
-  ( i { pc = pc + 1 }, True)
+step' (Cpy (I x) (R y)) i = ( setR y x . stepP $ i , False)
+step' (Cpy (R x) (R y)) i = ( setR y (getR x i) . stepP $ i , False)
+step' (Inc (R x)) i = ( modifyR x (+1) . stepP $ i , False)
+step' (Dec (R x)) i = ( modifyR x (\v -> v-1) . stepP $ i , False)
+step' (Jnz (R x) (I w)) i = ( modifyR 'p' (\pc -> if v /= 0 then pc+w else pc+1) i, False) where v = getR x i
+step' (Jnz (I v) (I w)) i = ( modifyR 'p' (\pc -> if v /= 0 then pc+w else pc+1) i, False)
+step' (Jnz (I v) (R y)) i = ( modifyR 'p' (\pc -> if v /= 0 then pc+w else pc+1) i, False) where w = getR y i
+step' (Out (R _)) i = ( stepP i, True)
 step' inst _ = error ("Non-implemented instruction: " ++ show inst)
+
+
+search :: [Int] -> Program -> IO ()
+search [] _ = error "Unreachable"
+search (i:is) program = do
+  let s = Interpreter { p=0, a=i, b=0, c=0, d=0, prog=program }
+  exitCode <- evalStateT run (s, [])
+  if exitCode == GoodLoop
+    then putStrLn $ "Found a good loop with initial value: " ++ show i
+    else search is program
 
 main :: IO ()
 main = do
   program <- map (toInst .  words) . lines <$> readFile "inputs/day25.txt"
-
-
-  let initializers = [0..10000]
-  let initInt a = Interpreter { pc = 1, regs = (a, 0, 0, 0), prog = program }
-  -- evalStateT will return the final output value
-  -- execStateT will return the final state
-  -- runStateT  will return (value, state), i.e. both!
-  forM_ initializers $ \initA -> do 
-    val <- evalStateT run (initInt initA, [])
-    print ("Initial value: " ++ show initA ++ ", exit code: " ++ show val)
+  search [0..] program
 
 
   

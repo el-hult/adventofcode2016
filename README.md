@@ -1,24 +1,17 @@
-WORK IN PROGESS: 
-- Day 01-24 done
-- Day    25 to be done
-
 For solving the AoC2016 advent calendar. http://adventofcode.com/2016
 
 Project structure inspired by (Tomash Aschan)[https://github.com/tomasaschan/advent-of-code-2018].
 
 # Instructions
 
-In 2025, I installed Stack using GHCUp https://www.haskell.org/ghcup/, so that HLS support worked nicer in my IDE (through GHCUp).
-I also udated the stackage resolver so it uses a newer version of GHC that I actually could download and install on MacOS.
+Running this in 2025, I installed Stack using GHCUp https://www.haskell.org/ghcup/, since that worked well.
 
 ## Code structure and running solvers
 
 One package per day called `dayXX`.
 Each package has their own executables, tests etc. Run with `stack run dayXX` or `stack test dayXX`.
 
-In development, you might want `stack build dayXX util --test --fast --file-watch --exec "dayXX"` instead.
-
-There is also a package `util` exposing the module `Util`. 
+There is also a package `util` for reused code.
 
 # Developing aid
 
@@ -29,7 +22,6 @@ There is a VSCode extension for it, but I did not get it to work with the multi-
 ```shell
 stack exec ormolu -- --mode inplace  some/file/path.hs 
 ```
-
 
 ## Profiling Haskell
 
@@ -92,16 +84,11 @@ open Main.hs.html
 Some Modules (e.g. Day 14) script have documentation in them. Compile them with Haddock.
 Read on that page for all options. https://haskell-haddock.readthedocs.io/en/latest/index.html
 
-```powershell
+```bash
 stack install haddock
 stack exec haddock -- --html  old/src/Day14.hs
 open Day14.html
 ```
-
-## Benchmarks
-Benchmarks are made by writing custom programs, and denote them as "bench" build targets. See Day22 for an example.
-The program itself is responsible for reporting relevant output via stdOut or writing reports to file.
-One framework that helps in that is Criterion. http://www.serpentine.com/criterion/tutorial.html
 
 ## Debugging
 

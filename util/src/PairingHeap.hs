@@ -1,4 +1,4 @@
-module Heap where
+module PairingHeap where
 
 -- | A pairing  heap implementation as per 
 -- https://stackoverflow.com/a/40581425/4050510

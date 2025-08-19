@@ -10,7 +10,7 @@ import Data.Sequence (Seq (..), (|>))
 import qualified Data.Sequence as SS
 import qualified Data.Set as S
 import Prelude hiding (head)
-import Heap
+import PairingHeap
 
 
 -------------------------------------------------------------------------
